@@ -38,6 +38,7 @@ import Promociones from './Componentes/Propietario/Promociones';
 import GestionReservas from './Componentes/Propietario/GestionReservas';
 import Reportes from './Componentes/Propietario/Reportes';
 import ConexionMP from './Componentes/Propietario/ConexionMP';
+import ConexionExitosa from './Componentes/Propietario/ConexionExitosa';
 //rutas administrativas
 import GestionUsuarios from './Componentes/Administrativo/GestionUsuarios';
 import GestionHoteles from './Componentes/Administrativo/GestionHoteles';
@@ -135,6 +136,7 @@ const App = () => {
             <Route path="/propietario/gestionreservas" element={<GestionReservas />} />
             <Route path="/propietario/reportes" element={<Reportes />} />
             <Route path="/propietario/conexionmp" element={<ConexionMP />} />
+            <Route path="/propietario/conexion-exitosa" element={<ConexionExitosa />} />
 
             {/* Rutas para el cliente */}
             

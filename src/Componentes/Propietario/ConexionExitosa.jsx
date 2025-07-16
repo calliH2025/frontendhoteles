@@ -16,7 +16,7 @@ const ConexionExitosa = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/propietario/hoteles"); // Cambia la ruta según tu flujo
+      navigate("/propietario"); // Cambia la ruta según tu flujo
     }, 6000); // Redirige automáticamente después de 6 segundos
     return () => clearTimeout(timer);
   }, [navigate]);

@@ -16,7 +16,9 @@ import { Security } from "@mui/icons-material";
 const ConexionMP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [id_usuario, setIdUsuario] = useState(null);
+  const [idUsuario, setIdUsuario] = useState(null);
+
+  const API_BASE = "https://backendreservas-m2zp.onrender.com/api/mercadopago";
 
   const colors = {
     primary: "#4c94bc",
@@ -79,24 +81,22 @@ const ConexionMP = () => {
   }, []);
 
   const handleConnect = async () => {
-    if (!id_usuario || loading) return;
+    if (!idUsuario || loading) return;
 
     setLoading(true);
     setError("");
 
     try {
-      const response = await axios.get(
-        `https://backendreservas-m2zp.onrender.com/api/mercadopago/iniciar-oauth?id_usuario=${id_usuario}`,
-        { timeout: 10000 }
-      );
+      const response = await axios.get(`${API_BASE}/iniciar-oauth?id_usuario=${idUsuario}`, {
+        timeout: 10000,
+      });
       const { oauthUrl } = response.data;
-      console.log("URL de OAuth recibida:", oauthUrl);
       window.location.href = oauthUrl;
     } catch (error) {
-      console.error("Error en conectar con Mercado Pago:", error.response?.data || error.message);
+      console.error("Error en conexión:", error.response?.data || error.message);
       setError(
         error.response?.data?.error ||
-          "Error al iniciar la conexión con Mercado Pago. Verifica los logs."
+          "Error al iniciar la conexión con Mercado Pago. Intenta nuevamente."
       );
     } finally {
       setLoading(false);
@@ -116,8 +116,8 @@ const ConexionMP = () => {
                 Conectar con Mercado Pago
               </Typography>
               <Typography variant="body1" sx={{ color: "#6c757d", mb: 3, lineHeight: 1.5 }}>
-                Conecta tu cuenta de Mercado Pago para recibir pagos directamente en tu cuenta.
-                Serás redirigido a Mercado Pago para autorizar la conexión de forma segura.
+                Conecta tu cuenta de Mercado Pago para recibir pagos directamente en tu cuenta. Serás
+                redirigido a Mercado Pago para autorizar la conexión de forma segura.
               </Typography>
               {error && (
                 <Alert
@@ -131,7 +131,7 @@ const ConexionMP = () => {
               <Button
                 variant="contained"
                 onClick={handleConnect}
-                disabled={loading || !id_usuario}
+                disabled={loading || !idUsuario}
                 sx={styles.button}
               >
                 {loading ? (
