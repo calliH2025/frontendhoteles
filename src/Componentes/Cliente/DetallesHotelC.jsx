@@ -58,7 +58,7 @@ const DetallesHoteles = () => {
     const fetchHotel = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/api/detallehotel/public/${id}`);
+        const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/detallehotel/public/${id}`);
         let imagenParsed = null;
         try {
           if (response.data.imagen) {
@@ -93,7 +93,7 @@ const DetallesHoteles = () => {
 
     const fetchComentarios = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/comentarios/hotel/${id}`, {
+        const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/comentarios/hotel/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setComentarios(response.data);
@@ -159,7 +159,7 @@ const DetallesHoteles = () => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/comentarios`,
+        `https://backendreservas-m2zp.onrender.com/api/comentarios`,
         { id_hotel: id, comentario, calificacion },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -171,7 +171,7 @@ const DetallesHoteles = () => {
         setSuccess("");
         handleCloseModal();
         // Actualizar la lista de comentarios
-        const response = await axios.get(`http://localhost:3000/api/comentarios/hotel/${id}`, {
+        const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/comentarios/hotel/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setComentarios(response.data);
@@ -184,11 +184,11 @@ const DetallesHoteles = () => {
 
   const handleDeleteComentario = async (id_comentario) => {
     try {
-      await axios.delete(`http://localhost:3000/api/comentarios/${id_comentario}`, {
+      await axios.delete(`https://backendreservas-m2zp.onrender.com/api/comentarios/${id_comentario}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       // Actualizar la lista de comentarios después de eliminar
-      const response = await axios.get(`http://localhost:3000/api/comentarios/hotel/${id}`, {
+      const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/comentarios/hotel/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setComentarios(response.data);

@@ -68,7 +68,7 @@ function CambiarPassword() {
 
   const checkPasswordHistory = async (password) => {
     try {
-      const response = await axios.post('https://backendiot-h632.onrender.com/api/cambio/check-password-history', {
+      const response = await axios.post('https://backendreservas-m2zp.onrender.com/api/cambio/check-password-history', {
         email,
         password,
       });
@@ -157,7 +157,7 @@ function CambiarPassword() {
     }
 
     try {
-      const response = await axios.post('https://backendd-q0zc.onrender.com/api/cambio/reset-password', {
+      const response = await axios.post('https://backendreservas-m2zp.onrender.com/api/cambio/reset-password', {
         email,
         newPassword,
       });

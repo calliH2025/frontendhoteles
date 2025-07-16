@@ -20,11 +20,11 @@ const Politica = () => {
         const fetchData = async () => {
             try {
                 // Obtener políticas
-                const politicasResponse = await axios.get('https://backendd-q0zc.onrender.com/api/politica');
+                const politicasResponse = await axios.get('https://backendreservas-m2zp.onrender.com/api/politica');
                 setPoliticas(politicasResponse.data);
 
                 // Obtener perfiles para el dropdown
-                const perfilesResponse = await axios.get('https://backendd-q0zc.onrender.com/api/perfil');
+                const perfilesResponse = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfil');
                 setPerfiles(perfilesResponse.data);
                 // Establecer id_empresa predeterminado si hay perfiles
                 if (perfilesResponse.data.length > 0 && !politica.id_empresa) {
@@ -69,7 +69,7 @@ const Politica = () => {
 
         try {
             if (editingId) {
-                await axios.put(`https://backendd-q0zc.onrender.com/api/politica/${editingId}`, politica);
+                await axios.put(`https://backendreservas-m2zp.onrender.com/api/politica/${editingId}`, politica);
                 MySwal.fire({
                     title: 'Éxito!',
                     text: 'La política ha sido actualizada correctamente y ahora está activa.',
@@ -77,7 +77,7 @@ const Politica = () => {
                     confirmButtonText: 'OK'
                 });
             } else {
-                await axios.post('https://backendd-q0zc.onrender.com/api/politica', politica);
+                await axios.post('https://backendreservas-m2zp.onrender.com/api/politica', politica);
                 MySwal.fire({
                     title: 'Éxito!',
                     text: 'La política ha sido creada correctamente y ahora está activa.',
@@ -93,7 +93,7 @@ const Politica = () => {
                 estado: 'activo'
             });
             setEditingId(null);
-            const response = await axios.get('https://backendd-q0zc.onrender.com/api/politica');
+            const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/politica');
             setPoliticas(response.data);
         } catch (error) {
             console.error('Error al guardar política:', error.message);
@@ -120,7 +120,7 @@ const Politica = () => {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`https://backendd-q0zc.onrender.com/api/politica/${id}`);
+                await axios.delete(`https://backendreservas-m2zp.onrender.com/api/politica/${id}`);
                 setPoliticas(politicas.filter(p => p.id !== id));
                 MySwal.fire(
                     'Eliminado!',

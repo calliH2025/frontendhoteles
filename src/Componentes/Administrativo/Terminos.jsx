@@ -20,11 +20,11 @@ const Terminos = () => {
         const fetchData = async () => {
             try {
                 // Obtener términos
-                const terminosResponse = await axios.get('https://backendd-q0zc.onrender.com/api/terminos');
+                const terminosResponse = await axios.get('https://backendreservas-m2zp.onrender.com/api/terminos');
                 setTerminos(terminosResponse.data);
 
                 // Obtener perfiles para el dropdown
-                const perfilesResponse = await axios.get('https://backendd-q0zc.onrender.com/api/perfil');
+                const perfilesResponse = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfil');
                 setPerfiles(perfilesResponse.data);
                 // Establecer id_empresa predeterminado si hay perfiles
                 if (perfilesResponse.data.length > 0 && !termino.id_empresa) {
@@ -69,7 +69,7 @@ const Terminos = () => {
 
         try {
             if (editingId) {
-                await axios.put(`https://backendd-q0zc.onrender.com/api/terminos/${editingId}`, termino);
+                await axios.put(`https://backendreservas-m2zp.onrender.com/api/terminos/${editingId}`, termino);
                 MySwal.fire({
                     title: 'Éxito!',
                     text: 'El término ha sido actualizado correctamente y ahora está activo.',
@@ -77,7 +77,7 @@ const Terminos = () => {
                     confirmButtonText: 'OK'
                 });
             } else {
-                await axios.post(`https://backendd-q0zc.onrender.com/api/terminos`, termino);
+                await axios.post(`https://backendreservas-m2zp.onrender.com/api/terminos`, termino);
                 MySwal.fire({
                     title: 'Éxito!',
                     text: 'El término ha sido creado correctamente y ahora está activo.',
@@ -93,7 +93,7 @@ const Terminos = () => {
                 estado: 'activo'
             });
             setEditingId(null);
-            const response = await axios.get('https://backendd-q0zc.onrender.com/api/terminos');
+            const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/terminos');
             setTerminos(response.data);
         } catch (error) {
             console.error('Error al guardar término:', error.message);
@@ -120,7 +120,7 @@ const Terminos = () => {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`https://backendd-q0zc.onrender.com/api/terminos/${id}`);
+                await axios.delete(`https://backendreservas-m2zp.onrender.com/api/terminos/${id}`);
                 setTerminos(terminos.filter(t => t.id !== id));
                 MySwal.fire(
                     'Eliminado!',

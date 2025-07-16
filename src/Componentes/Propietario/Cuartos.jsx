@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Autenticacion/AuthContext';
 import Swal from 'sweetalert2';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'https://backendreservas-m2zp.onrender.com';
 
 const Cuartos = () => {
   const navigate = useNavigate();

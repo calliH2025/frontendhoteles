@@ -20,11 +20,11 @@ const Mision = () => {
         const fetchData = async () => {
             try {
                 // Obtener misiones
-                const misionesResponse = await axios.get('https://backendd-q0zc.onrender.com/api/mision');
+                const misionesResponse = await axios.get('https://backendreservas-m2zp.onrender.com/api/mision');
                 setMisiones(misionesResponse.data);
 
                 // Obtener perfiles para el dropdown
-                const perfilesResponse = await axios.get('https://backendd-q0zc.onrender.com/api/perfil');
+                const perfilesResponse = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfil');
                 setPerfiles(perfilesResponse.data);
                 // Establecer id_empresa predeterminado si hay perfiles
                 if (perfilesResponse.data.length > 0 && !mision.id_empresa) {
@@ -69,7 +69,7 @@ const Mision = () => {
 
         try {
             if (editingId) {
-                await axios.put(`https://backendd-q0zc.onrender.com/api/mision/${editingId}`, mision);
+                await axios.put(`https://backendreservas-m2zp.onrender.com/api/mision/${editingId}`, mision);
                 MySwal.fire({
                     title: 'Éxito!',
                     text: 'La misión ha sido actualizada correctamente y ahora está activa.',
@@ -77,7 +77,7 @@ const Mision = () => {
                     confirmButtonText: 'OK'
                 });
             } else {
-                await axios.post('https://backendd-q0zc.onrender.com/api/mision', mision);
+                await axios.post('https://backendreservas-m2zp.onrender.com/api/mision', mision);
                 MySwal.fire({
                     title: 'Éxito!',
                     text: 'La misión ha sido creada correctamente y ahora está activa.',
@@ -93,7 +93,7 @@ const Mision = () => {
                 estado: 'activo'
             });
             setEditingId(null);
-            const response = await axios.get('https://backendd-q0zc.onrender.com/api/mision');
+            const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/mision');
             setMisiones(response.data);
         } catch (error) {
             console.error('Error al guardar misión:', error.message);
@@ -120,7 +120,7 @@ const Mision = () => {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`https://backendd-q0zc.onrender.com/api/mision/${id}`);
+                await axios.delete(`https://backendreservas-m2zp.onrender.com/api/mision/${id}`);
                 setMisiones(misiones.filter(m => m.id !== id));
                 MySwal.fire(
                     'Eliminado!',

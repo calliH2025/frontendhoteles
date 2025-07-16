@@ -39,7 +39,7 @@ const GestionReservas = () => {
     const fetchReservas = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get("http://localhost:3000/api/gestionreservas/", {
+        const response = await axios.get("https://backendreservas-m2zp.onrender.com/api/gestionreservas/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReservas(response.data);
@@ -58,7 +58,7 @@ const GestionReservas = () => {
   const fetchReservasByDate = async (date) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`http://localhost:3000/api/gestionreservas/fecha/${date}`, {
+      const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/gestionreservas/fecha/${date}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (response.data.length > 0) {

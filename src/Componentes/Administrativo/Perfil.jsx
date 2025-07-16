@@ -20,7 +20,7 @@ const Perfil = () => {
     useEffect(() => {
         const fetchPerfiles = async () => {
             try {
-                const response = await axios.get('https://backendd-q0zc.onrender.com/api/perfil');
+                const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfil');
                 console.log('Datos recibidos del backend:', response.data);
                 setPerfiles(response.data);
             } catch (error) {
@@ -95,7 +95,7 @@ const Perfil = () => {
 
         try {
             if (editingId) {
-                await axios.put(`https://backendd-q0zc.onrender.com/api/perfil/${editingId}`, formData, {
+                await axios.put(`https://backendreservas-m2zp.onrender.com/api/perfil/${editingId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -107,7 +107,7 @@ const Perfil = () => {
                     confirmButtonText: 'OK'
                 });
             } else {
-                await axios.post('https://backendd-q0zc.onrender.com/api/perfil', formData, {
+                await axios.post('https://backendreservas-m2zp.onrender.com/api/perfil', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -129,7 +129,7 @@ const Perfil = () => {
                 Telefono: ''
             });
             setEditingId(null);
-            const response = await axios.get('https://backendd-q0zc.onrender.com/api/perfil');
+            const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfil');
             setPerfiles(response.data);
         } catch (error) {
             console.error('Error al guardar perfil:', error.message);
@@ -156,7 +156,7 @@ const Perfil = () => {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`https://backendd-q0zc.onrender.com/api/perfil/${id}`);
+                await axios.delete(`https://backendreservas-m2zp.onrender.com/api/perfil/${id}`);
                 setPerfiles(perfiles.filter(p => p.id !== id));
                 Swal.fire(
                     'Eliminado!',

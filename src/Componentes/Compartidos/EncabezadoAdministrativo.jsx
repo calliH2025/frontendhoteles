@@ -15,7 +15,7 @@ const EncabezadoAdministrativo = () => {
   useEffect(() => {
     const fetchPerfil = async () => {
       try {
-        const response = await axios.get('https://backendd-q0zc.onrender.com/api/perfilF');
+        const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfilF');
         const data = response.data;
 
         console.log('Datos recibidos del backend:', data); // Depuración
@@ -78,6 +78,9 @@ const EncabezadoAdministrativo = () => {
         break;
       case "Promociones":
         navigate('/admin/gestionpromociones');
+        break;
+      case "MetodoPago":
+        navigate('/admin/metodopago');
         break;
       case "PerfilUsuario":
         navigate('/admin/perfilusuario');
@@ -299,6 +302,7 @@ const EncabezadoAdministrativo = () => {
                   <li onClick={() => { handleClick('Reservas'); handleMenuClick('Reservas'); }}>Reservas</li>
                   <li onClick={() => { handleClick('Estadisticas'); handleMenuClick('Estadisticas'); }}>Estadísticas</li>
                   <li onClick={() => { handleClick('Promociones'); handleMenuClick('Promociones'); }}>Promociones</li>
+                   <li onClick={() => { handleClick('MetodoPago'); handleMenuClick('MetodoPago'); }}>Método de Pago</li>
                 </ul>
               )}
             </li>

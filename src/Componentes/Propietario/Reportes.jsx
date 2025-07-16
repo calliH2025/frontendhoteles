@@ -57,7 +57,7 @@ export default function ReporteReservas() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "http://localhost:3000/api/gestionreservas/reportes",
+          "https://backendreservas-m2zp.onrender.com/api/gestionreservas/reportes",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

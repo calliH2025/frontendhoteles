@@ -177,7 +177,7 @@ const modalStyle = {
   overflow: 'hidden',
 };
 
-const API_BASE_URL = "http://localhost:3000"; // Cambia esto según tu configuración
+const API_BASE_URL = "https://backendreservas-m2zp.onrender.com"; // Cambia esto según tu configuración
 
 function Tipohabitacion() {
   const [tipoHabitacion, setTipoHabitacion] = useState({

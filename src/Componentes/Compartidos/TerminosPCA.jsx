@@ -42,7 +42,7 @@ const theme = createTheme({
 });
 
 // URL base del backend para desarrollo local
-const API_BASE_URL = "https://backendd-q0zc.onrender.com";
+const API_BASE_URL = "https://backendreservas-m2zp.onrender.com";
 
 function TerminosPCA() {
   const [terminoActivo, setTerminoActivo] = useState(null);

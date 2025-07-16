@@ -37,6 +37,7 @@ import TipoHabitacionPropietario from './Componentes/Propietario/TiposHabitacion
 import Promociones from './Componentes/Propietario/Promociones';
 import GestionReservas from './Componentes/Propietario/GestionReservas';
 import Reportes from './Componentes/Propietario/Reportes';
+import ConexionMP from './Componentes/Propietario/ConexionMP';
 //rutas administrativas
 import GestionUsuarios from './Componentes/Administrativo/GestionUsuarios';
 import GestionHoteles from './Componentes/Administrativo/GestionHoteles';
@@ -48,6 +49,8 @@ import Perfil from './Componentes/Administrativo/Perfil';
 import GestionReservasAd from './Componentes/Administrativo/GestionReservasad';
 import EstadisticasGenerales from './Componentes/Administrativo/EstadisticasGenerales';
 import GestionPromociones from './Componentes/Administrativo/GestionPromociones';
+import RegistroCatalogoPagos from './Componentes/Administrativo/RegistroCatalogoPagos';
+import CataloPagos from './Componentes/Cliente/CatalogoDePagos';
 
 const CuartosPWrapper = () => {
   const { idHotel } = useParams(); // Extrae idHotel de la URL
@@ -101,7 +104,8 @@ const App = () => {
             <Route path="/admin/gestionreservasad" element={<GestionReservasAd />} />
             <Route path="/admin/estadisticas" element={<EstadisticasGenerales />} />
             <Route path="/admin/gestionpromociones" element={<GestionPromociones />} />
-            
+            <Route path="/admin/metodopago" element={<RegistroCatalogoPagos />} />
+
             {/* Rutas para el cliente */}
             <Route path="/cliente" element={<PaginaPrincipalCliente />} />
             <Route path="/cliente/politicaspca" element={<PoliticasPCA/>} />
@@ -114,6 +118,8 @@ const App = () => {
             <Route path="/cliente/detalles-hoteles/:id" element={<DetallesHotelC />} />
             <Route path="/cliente/historial-reservas" element={<HistorialReservas />} />
             <Route path="/cliente/perfilusuario" element={<PerfilUsuario />} />
+            <Route path="/cliente/catalopagos" element={<CataloPagos />} />
+
 
             {/* Rutas para el propietario */}
             <Route path="/propietario" element={<PaginaPrincipalPropietario />} />
@@ -128,6 +134,9 @@ const App = () => {
             <Route path="/propietario/perfilusuario" element={<PerfilUsuario />} />
             <Route path="/propietario/gestionreservas" element={<GestionReservas />} />
             <Route path="/propietario/reportes" element={<Reportes />} />
+            <Route path="/propietario/conexionmp" element={<ConexionMP />} />
+
+            {/* Rutas para el cliente */}
             
           </Routes>
         </LayoutConEncabezado>

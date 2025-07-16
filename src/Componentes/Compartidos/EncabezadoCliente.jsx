@@ -14,7 +14,7 @@ const EncabezadoCliente = () => {
   useEffect(() => {
     const fetchPerfil = async () => {
       try {
-        const response = await axios.get('https://backendd-q0zc.onrender.com/api/perfilF');
+        const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/perfilF');
         const data = response.data;
         setNombreEmpresa(data.NombreEmpresa || 'Nombre no disponible');
         setLogoUrl(data.Logo ? `data:image/jpeg;base64,${data.Logo}` : '');
@@ -45,6 +45,9 @@ const EncabezadoCliente = () => {
         break;
       case "MisReservas":
         navigate('/cliente/historial-reservas');
+        break;
+        case "pagos":
+        navigate('/cliente/catalopagos');
         break;
       case "MiPerfil":
         navigate('/cliente/perfilusuario');
@@ -214,6 +217,10 @@ const EncabezadoCliente = () => {
             <li onClick={() => handleMenuClick('MisReservas')}>
               <CalendarOutlined style={{ color: 'var(--color-icon-usercalendar)' }} />
               Mis Reservas
+            </li>
+            <li onClick={() => handleMenuClick('pagos')}>
+              <CalendarOutlined style={{ color: 'var(--color-icon-usercalendar)' }} />
+              Pagos
             </li>
             <li onClick={() => handleMenuClick('MiPerfil')}>
               <UserOutlined style={{ color: 'var(--color-icon-user)' }} />

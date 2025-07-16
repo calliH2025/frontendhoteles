@@ -1,10 +1,9 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -13,15 +12,6 @@ import {
   TableRow,
   Chip,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Tabs,
   Tab,
   Grid,
@@ -30,17 +20,15 @@ import {
   Tooltip,
   Avatar,
   Stack,
-} from "@mui/material"
+  CircularProgress,
+  TextField,
+} from "@mui/material";
 import {
   Delete as DeleteIcon,
-  Edit as EditIcon,
-  Add as AddIcon,
-  Check as CheckIcon,
-  Close as CloseIcon,
   TrendingUp as TrendingUpIcon,
-  Campaign as CampaignIcon,
   Store as StoreIcon,
-} from "@mui/icons-material"
+  Campaign as CampaignIcon,
+} from "@mui/icons-material";
 import {
   BarChart,
   Bar,
@@ -52,213 +40,147 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts"
+} from "recharts";
+import axios from "axios";
 
 const GestionPromociones = () => {
-  const [tabValue, setTabValue] = useState(0)
-  const [promociones, setPromociones] = useState([
-    {
-      id: 1,
-      titulo: "Descuento Verano 2024",
-      descripcion: "50% de descuento en hospedajes de playa",
-      tipo: "global",
-      descuento: 50,
-      fechaInicio: "2024-06-01",
-      fechaFin: "2024-08-31",
-      estado: "activo",
-      propietario: "Admin",
-      propiedadesAplicadas: 25,
-      usos: 150,
-    },
-    {
-      id: 2,
-      titulo: "Promoción Casa del Mar",
-      descripcion: "Estancia mínima 3 noches con desayuno incluido",
-      tipo: "propietario",
-      descuento: 30,
-      fechaInicio: "2024-07-01",
-      fechaFin: "2024-09-30",
-      estado: "pendiente",
-      propietario: "Juan Pérez",
-      propiedadesAplicadas: 1,
-      usos: 8,
-    },
-    {
-      id: 3,
-      titulo: "Oferta Fin de Semana",
-      descripcion: "Descuento especial para reservas de fin de semana",
-      tipo: "global",
-      descuento: 25,
-      fechaInicio: "2024-07-15",
-      fechaFin: "2024-12-31",
-      estado: "activo",
-      propietario: "Admin",
-      propiedadesAplicadas: 40,
-      usos: 89,
-    },
-    {
-      id: 4,
-      titulo: "Villa Sunset Especial",
-      descripcion: "Promoción exclusiva para Villa Sunset",
-      tipo: "propietario",
-      descuento: 40,
-      fechaInicio: "2024-08-01",
-      fechaFin: "2024-10-31",
-      estado: "inactivo",
-      propietario: "María González",
-      propiedadesAplicadas: 1,
-      usos: 0,
-    },
-  ])
+  const [tabValue, setTabValue] = useState(0);
+  const [promociones, setPromociones] = useState([]);
+  const [estadisticasData, setEstadisticasData] = useState([]);
+  const [usosData, setUsosData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [error, setError] = useState(null);
+  const [filtroPropietario, setFiltroPropietario] = useState(""); // Estado para el filtro de propietario
 
-  const [openDialog, setOpenDialog] = useState(false)
-  const [dialogType, setDialogType] = useState("create")
-  const [selectedPromocion, setSelectedPromocion] = useState(null)
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
-
-  const [formData, setFormData] = useState({
-    titulo: "",
-    descripcion: "",
-    descuento: "",
-    fechaInicio: "",
-    fechaFin: "",
-    tipo: "global",
-  })
-
-  // Datos para gráficos
-  const estadisticasData = [
-    { name: "Activas", value: promociones.filter((p) => p.estado === "activo").length, color: "#4caf50" },
-    { name: "Pendientes", value: promociones.filter((p) => p.estado === "pendiente").length, color: "#ff9800" },
-    { name: "Inactivas", value: promociones.filter((p) => p.estado === "inactivo").length, color: "#f44336" },
-  ]
-
-  const usosData = promociones.map((p) => ({
-    name: p.titulo.substring(0, 15) + "...",
-    usos: p.usos,
-    descuento: p.descuento,
-  }))
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [promocionesRes, statsRes] = await Promise.all([
+          axios.get('https://backendreservas-m2zp.onrender.com/api/gestionpromocionesadmin/list'),
+          axios.get('https://backendreservas-m2zp.onrender.com/api/gestionpromocionesadmin/stats'),
+        ]);
+        console.log('Promociones:', promocionesRes.data); // Depuración
+        console.log('Estadísticas:', statsRes.data); // Depuración
+        setPromociones(promocionesRes.data);
+        setEstadisticasData(statsRes.data.estadisticasData);
+        setUsosData(statsRes.data.usosData);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+        setError('No se pudieron cargar las promociones. Por favor, intenta de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleTabChange = (event, newValue) => {
-    setTabValue(newValue)
-  }
+    setTabValue(newValue);
+  };
 
-  const handleOpenDialog = (type, promocion = null) => {
-    setDialogType(type)
-    setSelectedPromocion(promocion)
-    if (promocion) {
-      setFormData({
-        titulo: promocion.titulo,
-        descripcion: promocion.descripcion,
-        descuento: promocion.descuento,
-        fechaInicio: promocion.fechaInicio,
-        fechaFin: promocion.fechaFin,
-        tipo: promocion.tipo,
-      })
-    } else {
-      setFormData({
-        titulo: "",
-        descripcion: "",
-        descuento: "",
-        fechaInicio: "",
-        fechaFin: "",
-        tipo: "global",
-      })
+  const handleFiltroPropietarioChange = (event) => {
+    setFiltroPropietario(event.target.value);
+  };
+
+  const handleDelete = async (id, estado) => {
+    console.log(`Intentando eliminar promoción con ID: ${id}, estado: ${estado}`); // Depuración
+    if (estado !== 'inactivo') {
+      setSnackbar({ open: true, message: 'Solo se pueden eliminar promociones inactivas', severity: 'error' });
+      return;
     }
-    setOpenDialog(true)
-  }
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
-    setSelectedPromocion(null)
-  }
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-  const handleSubmit = () => {
-    if (dialogType === "create") {
-      const newPromocion = {
-        id: Date.now(),
-        ...formData,
-        estado: "activo",
-        propietario: "Admin",
-        propiedadesAplicadas: formData.tipo === "global" ? Math.floor(Math.random() * 50) + 10 : 1,
-        usos: 0,
-      }
-      setPromociones((prev) => [...prev, newPromocion])
-      setSnackbar({ open: true, message: "Promoción creada exitosamente", severity: "success" })
-    } else if (dialogType === "edit") {
-      setPromociones((prev) => prev.map((p) => (p.id === selectedPromocion.id ? { ...p, ...formData } : p)))
-      setSnackbar({ open: true, message: "Promoción actualizada exitosamente", severity: "success" })
+    try {
+      const response = await axios.delete(`https://backendreservas-m2zp.onrender.com/api/gestionpromocionesadmin/delete/${id}`);
+      console.log('Respuesta de eliminación:', response.data); // Depuración
+      setPromociones((prev) => prev.filter((p) => p.id !== id));
+      setSnackbar({ open: true, message: 'Promoción eliminada exitosamente', severity: 'success' });
+    } catch (error) {
+      console.error('Error al eliminar promoción:', error.response?.data || error.message);
+      setSnackbar({ 
+        open: true, 
+        message: error.response?.data?.error || 'Error al eliminar promoción', 
+        severity: 'error' 
+      });
     }
-    handleCloseDialog()
-  }
-
-  const handleDelete = (id) => {
-    setPromociones((prev) => prev.filter((p) => p.id !== id))
-    setSnackbar({ open: true, message: "Promoción eliminada exitosamente", severity: "success" })
-  }
-
-  const handleApprove = (id) => {
-    setPromociones((prev) => prev.map((p) => (p.id === id ? { ...p, estado: "activo" } : p)))
-    setSnackbar({ open: true, message: "Promoción aprobada exitosamente", severity: "success" })
-  }
-
-  const handleReject = (id) => {
-    setPromociones((prev) => prev.map((p) => (p.id === id ? { ...p, estado: "inactivo" } : p)))
-    setSnackbar({ open: true, message: "Promoción rechazada", severity: "info" })
-  }
+  };
 
   const getStatusColor = (estado) => {
     switch (estado) {
-      case "activo":
-        return "success"
-      case "pendiente":
-        return "warning"
-      case "inactivo":
-        return "error"
+      case 'activo':
+        return 'success';
+      case 'inactivo':
+        return 'error';
       default:
-        return "default"
+        return 'default';
     }
-  }
+  };
 
   const getStatusText = (estado) => {
     switch (estado) {
-      case "activo":
-        return "Activo"
-      case "pendiente":
-        return "Pendiente"
-      case "inactivo":
-        return "Inactivo"
+      case 'activo':
+        return 'Activo';
+      case 'inactivo':
+        return 'Inactivo';
       default:
-        return estado
+        return estado;
     }
-  }
+  };
 
   const filteredPromociones = () => {
+    let filtered = promociones;
+    
+    // Aplicar filtro por pestaña
     switch (tabValue) {
       case 0:
-        return promociones // Todas
+        filtered = promociones; // Todas
+        break;
       case 1:
-        return promociones.filter((p) => p.tipo === "global") // Globales
+        filtered = promociones.filter((p) => p.tipo === 'propietario'); // Propietarios
+        break;
       case 2:
-        return promociones.filter((p) => p.tipo === "propietario") // Propietarios
+        filtered = promociones.filter((p) => p.estado === 'activo'); // Activas
+        break;
       case 3:
-        return promociones.filter((p) => p.estado === "pendiente") // Pendientes
+        filtered = promociones.filter((p) => p.estado === 'inactivo'); // Inactivas
+        break;
       default:
-        return promociones
+        filtered = promociones;
     }
+
+    // Aplicar filtro por propietario
+    if (filtroPropietario.trim() !== "") {
+      filtered = filtered.filter((p) =>
+        p.propietario.toLowerCase().includes(filtroPropietario.toLowerCase())
+      );
+    }
+
+    return filtered;
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
   }
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <CampaignIcon fontSize="large" color="primary" />
           Gestión de Promociones
         </Typography>
@@ -308,17 +230,27 @@ const GestionPromociones = () => {
         </Grid>
       </Grid>
 
-      {/* Tabs y Botón Crear */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+      {/* Filtro por Propietario */}
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          label="Filtrar por Propietario"
+          variant="outlined"
+          value={filtroPropietario}
+          onChange={handleFiltroPropietarioChange}
+          fullWidth
+          sx={{ maxWidth: 400 }}
+          placeholder="Escribe el nombre del propietario"
+        />
+      </Box>
+
+      {/* Tabs */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab label="Todas" />
-          <Tab label="Globales" />
           <Tab label="Propietarios" />
-          <Tab label="Pendientes" />
+          <Tab label="Activas" />
+          <Tab label="Inactivas" />
         </Tabs>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog("create")} sx={{ ml: 2 }}>
-          Nueva Promoción
-        </Button>
       </Box>
 
       {/* Tabla de Promociones */}
@@ -352,10 +284,10 @@ const GestionPromociones = () => {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      icon={promocion.tipo === "global" ? <TrendingUpIcon /> : <StoreIcon />}
-                      label={promocion.tipo === "global" ? "Global" : "Propietario"}
+                      icon={promocion.tipo === 'global' ? <TrendingUpIcon /> : <StoreIcon />}
+                      label={promocion.tipo === 'global' ? 'Global' : 'Propietario'}
                       variant="outlined"
-                      color={promocion.tipo === "global" ? "primary" : "secondary"}
+                      color={promocion.tipo === 'global' ? 'primary' : 'secondary'}
                       size="small"
                     />
                   </TableCell>
@@ -366,7 +298,7 @@ const GestionPromociones = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {new Date(promocion.fechaInicio).toLocaleDateString()} -{" "}
+                      {new Date(promocion.fechaInicio).toLocaleDateString()} -{' '}
                       {new Date(promocion.fechaFin).toLocaleDateString()}
                     </Typography>
                   </TableCell>
@@ -378,8 +310,8 @@ const GestionPromociones = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Avatar sx={{ width: 24, height: 24, fontSize: "0.75rem" }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
                         {promocion.propietario.charAt(0)}
                       </Avatar>
                       <Typography variant="body2">{promocion.propietario}</Typography>
@@ -393,29 +325,17 @@ const GestionPromociones = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Stack direction="row" spacing={1}>
-                      {promocion.estado === "pendiente" && (
-                        <>
-                          <Tooltip title="Aprobar">
-                            <IconButton size="small" color="success" onClick={() => handleApprove(promocion.id)}>
-                              <CheckIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Rechazar">
-                            <IconButton size="small" color="error" onClick={() => handleReject(promocion.id)}>
-                              <CloseIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </>
-                      )}
-                      <Tooltip title="Editar">
-                        <IconButton size="small" color="primary" onClick={() => handleOpenDialog("edit", promocion)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Eliminar">
-                        <IconButton size="small" color="error" onClick={() => handleDelete(promocion.id)}>
-                          <DeleteIcon />
-                        </IconButton>
+                      <Tooltip title={promocion.estado === 'inactivo' ? 'Eliminar' : 'No disponible (solo inactivas)'}>
+                        <span>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDelete(promocion.id, promocion.estado)}
+                            disabled={promocion.estado !== 'inactivo'}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </Stack>
                   </TableCell>
@@ -426,96 +346,18 @@ const GestionPromociones = () => {
         </TableContainer>
       </Card>
 
-      {/* Dialog para Crear/Editar */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>{dialogType === "create" ? "Nueva Promoción" : "Editar Promoción"}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Título de la Promoción"
-                  value={formData.titulo}
-                  onChange={(e) => handleInputChange("titulo", e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  label="Descripción"
-                  value={formData.descripcion}
-                  onChange={(e) => handleInputChange("descripcion", e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Tipo de Promoción</InputLabel>
-                  <Select
-                    value={formData.tipo}
-                    label="Tipo de Promoción"
-                    onChange={(e) => handleInputChange("tipo", e.target.value)}
-                  >
-                    <MenuItem value="global">Global</MenuItem>
-                    <MenuItem value="propietario">Propietario</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Descuento (%)"
-                  value={formData.descuento}
-                  onChange={(e) => handleInputChange("descuento", e.target.value)}
-                  inputProps={{ min: 1, max: 100 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Fecha de Inicio"
-                  value={formData.fechaInicio}
-                  onChange={(e) => handleInputChange("fechaInicio", e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Fecha de Fin"
-                  value={formData.fechaFin}
-                  onChange={(e) => handleInputChange("fechaFin", e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            {dialogType === "create" ? "Crear" : "Actualizar"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Snackbar */}
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          sx={{ width: '100%' }}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
     </Box>
-  )
-}
+  );
+};
 
 export default GestionPromociones;

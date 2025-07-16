@@ -1,6 +1,4 @@
-"use client"
-
-import { useState } from "react"
+import { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -20,8 +18,10 @@ import {
   Tab,
   useTheme,
   alpha,
-} from "@mui/material"
-import { Hotel, People, AttachMoney, EventAvailable, Star, Visibility } from "@mui/icons-material"
+  CircularProgress,
+  Alert,
+} from "@mui/material";
+import { Hotel, People, AttachMoney, EventAvailable, Visibility } from "@mui/icons-material";
 import {
   XAxis,
   YAxis,
@@ -33,97 +33,60 @@ import {
   Cell,
   Area,
   AreaChart,
-} from "recharts"
+} from "recharts";
+import axios from "axios";
 
 const HotelDashboard = () => {
-  const theme = useTheme()
-  const [tabValue, setTabValue] = useState(0)
+  const theme = useTheme();
+  const [tabValue, setTabValue] = useState(0);
+  const [generalStats, setGeneralStats] = useState({
+    totalUsers: { admin: 0, hotelOwner: 0, guest: 0 },
+    totalHotels: 0,
+    generalOccupancy: 0,
+    estimatedRevenue: 0,
+  });
+  const [reservationData, setReservationData] = useState([]);
+  const [userTypeData, setUserTypeData] = useState([]);
+  const [topHotels, setTopHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Datos de ejemplo
-  const generalStats = {
-    totalUsers: {
-      admin: 15,
-      hotelOwner: 234,
-      guest: 12847,
-    },
-    totalHotels: 456,
-    generalOccupancy: 78.5,
-    estimatedRevenue: 2847392,
-  }
-
-  const reservationData = [
-    { period: "Lun", daily: 45, weekly: 315, monthly: 1350 },
-    { period: "Mar", daily: 52, weekly: 364, monthly: 1560 },
-    { period: "Mié", daily: 38, weekly: 266, monthly: 1140 },
-    { period: "Jue", daily: 61, weekly: 427, monthly: 1830 },
-    { period: "Vie", daily: 73, weekly: 511, monthly: 2190 },
-    { period: "Sáb", daily: 89, weekly: 623, monthly: 2670 },
-    { period: "Dom", daily: 67, weekly: 469, monthly: 2010 },
-  ]
-
-  const userTypeData = [
-    { name: "Huéspedes", value: generalStats.totalUsers.guest, color: "#8884d8" },
-    { name: "Propietarios", value: generalStats.totalUsers.hotelOwner, color: "#82ca9d" },
-    { name: "Administradores", value: generalStats.totalUsers.admin, color: "#ffc658" },
-  ]
-
-  const topHotels = [
-    {
-      id: 1,
-      name: "Hotel Paradise Resort",
-      location: "Cancún, México",
-      reservations: 234,
-      revenue: 145000,
-      rating: 4.8,
-      occupancy: 92,
-    },
-    {
-      id: 2,
-      name: "Grand Plaza Hotel",
-      location: "Ciudad de México",
-      reservations: 198,
-      revenue: 128000,
-      rating: 4.6,
-      occupancy: 87,
-    },
-    {
-      id: 3,
-      name: "Beachfront Suites",
-      location: "Playa del Carmen",
-      reservations: 176,
-      revenue: 112000,
-      rating: 4.7,
-      occupancy: 84,
-    },
-    {
-      id: 4,
-      name: "Mountain View Lodge",
-      location: "Guadalajara",
-      reservations: 154,
-      revenue: 98000,
-      rating: 4.5,
-      occupancy: 79,
-    },
-    {
-      id: 5,
-      name: "City Center Hotel",
-      location: "Monterrey",
-      reservations: 142,
-      revenue: 89000,
-      rating: 4.4,
-      occupancy: 76,
-    },
-  ]
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [statsRes, reservationRes, userTypeRes, hotelsRes] = await Promise.all([
+          axios.get('https://backendreservas-m2zp.onrender.com/api/gestionestadisticasadmin/general-stats'),
+          axios.get('https://backendreservas-m2zp.onrender.com/api/gestionestadisticasadmin/reservation-data'),
+          axios.get('https://backendreservas-m2zp.onrender.com/api/gestionestadisticasadmin/user-type-data'),
+          axios.get('https://backendreservas-m2zp.onrender.com/api/gestionestadisticasadmin/top-hotels'),
+        ]);
+        console.log('General Stats:', statsRes.data); // Depuración
+        setGeneralStats(statsRes.data);
+        setReservationData(reservationRes.data);
+        setUserTypeData(userTypeRes.data);
+        setTopHotels(hotelsRes.data);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+        setError('No se pudieron cargar las estadísticas. Por favor, intenta de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const StatCard = ({ title, value, icon, color, subtitle }) => (
     <Card
       sx={{
-        height: "100%",
+        height: '100%',
         background: `linear-gradient(135deg, ${alpha(color, 0.1)} 0%, ${alpha(color, 0.05)} 100%)`,
         border: `1px solid ${alpha(color, 0.2)}`,
-        transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-4px)",
+        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'translateY(-4px)',
           boxShadow: theme.shadows[8],
         },
       }}
@@ -134,7 +97,7 @@ const HotelDashboard = () => {
             <Typography color="textSecondary" gutterBottom variant="body2">
               {title}
             </Typography>
-            <Typography variant="h4" component="h2" sx={{ color: color, fontWeight: "bold" }}>
+            <Typography variant="h4" component="h2" sx={{ color: color, fontWeight: 'bold' }}>
               {value}
             </Typography>
             {subtitle && (
@@ -147,33 +110,49 @@ const HotelDashboard = () => {
         </Box>
       </CardContent>
     </Card>
-  )
+  );
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
       minimumFractionDigits: 0,
-    }).format(amount)
-  }
+    }).format(amount || 0);
+  };
 
   const getReservationData = () => {
     switch (tabValue) {
       case 0:
-        return reservationData.map((item) => ({ ...item, value: item.daily }))
+        return reservationData.map((item) => ({ ...item, value: item.daily }));
       case 1:
-        return reservationData.map((item) => ({ ...item, value: item.weekly }))
+        return reservationData.map((item) => ({ ...item, value: item.weekly }));
       case 2:
-        return reservationData.map((item) => ({ ...item, value: item.monthly }))
+        return reservationData.map((item) => ({ ...item, value: item.monthly }));
       default:
-        return reservationData.map((item) => ({ ...item, value: item.daily }))
+        return reservationData.map((item) => ({ ...item, value: item.daily }));
     }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
   }
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold", color: "#333" }}>
-        Estadísticas General
+    <Box sx={{ flexGrow: 1, p: 3, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#333' }}>
+        Estadísticas Generales
       </Typography>
 
       {/* Estadísticas Generales */}
@@ -181,7 +160,7 @@ const HotelDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total de Hoteles"
-            value={generalStats.totalHotels.toLocaleString()}
+            value={generalStats.totalHotels.toLocaleString() || '0'}
             icon={<Hotel />}
             color="#1976d2"
             subtitle="Registrados en el sistema"
@@ -192,7 +171,7 @@ const HotelDashboard = () => {
             title="Total de Usuarios"
             value={Object.values(generalStats.totalUsers)
               .reduce((a, b) => a + b, 0)
-              .toLocaleString()}
+              .toLocaleString() || '0'}
             icon={<People />}
             color="#388e3c"
             subtitle="Usuarios activos"
@@ -201,7 +180,7 @@ const HotelDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Ocupación General"
-            value={`${generalStats.generalOccupancy}%`}
+            value={`${generalStats.generalOccupancy || '0'}%`}
             icon={<EventAvailable />}
             color="#f57c00"
             subtitle="Promedio del sistema"
@@ -223,7 +202,7 @@ const HotelDashboard = () => {
         <Grid item xs={12} md={6}>
           <Card sx={{ height: 400 }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Distribución de Usuarios por Tipo
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
@@ -253,7 +232,7 @@ const HotelDashboard = () => {
         <Grid item xs={12} md={6}>
           <Card sx={{ height: 400 }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Reservas por Período
               </Typography>
               <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ mb: 2 }}>
@@ -284,28 +263,25 @@ const HotelDashboard = () => {
         <Grid item xs={12}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
                 Hoteles con Más Actividad
               </Typography>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}>
-                      <TableCell sx={{ fontWeight: "bold" }}>Hotel</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Ubicación</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Hotel</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Ubicación</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>
                         Reservas
                       </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>
                         Ingresos
                       </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Rating
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>
                         Ocupación
                       </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>
                         Acciones
                       </TableCell>
                     </TableRow>
@@ -315,15 +291,15 @@ const HotelDashboard = () => {
                       <TableRow
                         key={hotel.id}
                         sx={{
-                          "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.05) },
-                          "&:nth-of-type(odd)": { backgroundColor: alpha(theme.palette.grey[500], 0.05) },
+                          '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.05) },
+                          '&:nth-of-type(odd)': { backgroundColor: alpha(theme.palette.grey[500], 0.05) },
                         }}
                       >
                         <TableCell>
                           <Box display="flex" alignItems="center">
                             <Avatar sx={{ mr: 2, bgcolor: theme.palette.primary.main }}>{index + 1}</Avatar>
                             <Box>
-                              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
                                 {hotel.name}
                               </Typography>
                             </Box>
@@ -339,20 +315,14 @@ const HotelDashboard = () => {
                           />
                         </TableCell>
                         <TableCell align="center">
-                          <Typography variant="body2" sx={{ fontWeight: "bold", color: "green" }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'green' }}>
                             {formatCurrency(hotel.revenue)}
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Box display="flex" alignItems="center" justifyContent="center">
-                            <Star sx={{ color: "#ffc107", mr: 0.5, fontSize: 16 }} />
-                            <Typography variant="body2">{hotel.rating}</Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="center">
                           <Chip
                             label={`${hotel.occupancy}%`}
-                            color={hotel.occupancy > 85 ? "success" : hotel.occupancy > 70 ? "warning" : "error"}
+                            color={hotel.occupancy > 85 ? 'success' : hotel.occupancy > 70 ? 'warning' : 'error'}
                             size="small"
                           />
                         </TableCell>
@@ -371,7 +341,7 @@ const HotelDashboard = () => {
         </Grid>
       </Grid>
     </Box>
-  )
-}
+  );
+};
 
 export default HotelDashboard;

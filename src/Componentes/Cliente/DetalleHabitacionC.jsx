@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Box,
@@ -42,6 +42,7 @@ import {
 
 const DetallesHabitacion = () => {
   const { idHabitacion } = useParams();
+  const navigate = useNavigate();
   const [habitacion, setHabitacion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,7 +52,6 @@ const DetallesHabitacion = () => {
     tipo_tarifa: "",
   });
   const [totalpagar, setTotalpagar] = useState(null);
-  const [reservationSuccess, setReservationSuccess] = useState("");
   const [id_usuario, setIdUsuario] = useState(null);
 
   const colors = {
@@ -252,7 +252,7 @@ const DetallesHabitacion = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:3000/api/detallesHabitacion/detalles/${idHabitacion}`
+        `https://backendreservas-m2zp.onrender.com/api/detallesHabitacion/detalles/${idHabitacion}`
       );
       console.log('Datos de habitación recibidos:', response.data);
       setHabitacion(response.data);
@@ -346,7 +346,7 @@ const DetallesHabitacion = () => {
 
     try {
       const response = await axios.post(
-        `https://backendd-q0zc.onrender.com/api/reservas/calculate-total`,
+        `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
         {
           id_habitacion: parseInt(idHabitacion),
           fechainicio: startDate.toISOString(),
@@ -370,7 +370,7 @@ const DetallesHabitacion = () => {
     }
   };
 
-  const handleReservation = async () => {
+  const handleReservation = () => {
     if (!id_usuario) {
       setError("No se pudo obtener el ID del usuario. Por favor, inicia sesión de nuevo.");
       return;
@@ -394,29 +394,18 @@ const DetallesHabitacion = () => {
       return;
     }
 
-    try {
-      const response = await axios.post(
-        `https://backendd-q0zc.onrender.com/api/reservas`,
-        {
-          id_usuario,
-          id_habitacion: parseInt(idHabitacion),
-          fechainicio: startDate.toISOString(),
-          fechafin: endDate.toISOString(),
-          tipo_tarifa,
-          totalpagar,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      console.log('Respuesta de reserva:', response.data);
-      setReservationSuccess(`¡Reserva creada con éxito! Total: $${response.data.totalpagar}`);
-      setError("");
-      setReservation({ fechainicio: "", fechafin: "", tipo_tarifa: "" });
-      setTotalpagar(null);
-      fetchHabitacion();
-    } catch (err) {
-      setError(err.response?.data?.error || "Error al realizar la reserva. Verifique los datos.");
-      console.error("Error al reservar:", err.response?.data || err);
-    }
+    // Navegar a la página de catálogo de pagos con los datos de la reserva
+    navigate("/cliente/catalopagos", {
+      state: {
+        id_usuario,
+        id_habitacion: parseInt(idHabitacion),
+        id_hotel: habitacion.id_hotel, // Asegúrate de que este campo exista en los datos de habitacion
+        fechainicio: startDate.toISOString(),
+        fechafin: endDate.toISOString(),
+        tipo_tarifa,
+        totalpagar,
+      },
+    });
   };
 
   const getServiceIcons = (servicios) => {
@@ -600,20 +589,6 @@ const DetallesHabitacion = () => {
             </CardContent>
           </Card>
         </Fade>
-
-        {reservationSuccess && (
-          <Zoom in={true}>
-            <Box sx={{ mb: 3 }}>
-              <Alert
-                severity="success"
-                onClose={() => setReservationSuccess("")}
-                sx={{ borderRadius: "12px", fontSize: "1.1rem" }}
-              >
-                {reservationSuccess}
-              </Alert>
-            </Box>
-          </Zoom>
-        )}
 
         <Fade in={true} timeout={1000}>
           <Box sx={{ mb: 4 }}>
@@ -924,7 +899,7 @@ const DetallesHabitacion = () => {
                     variant="caption"
                     sx={{ color: "#6c757d", textAlign: "center", mt: 1, display: "block" }}
                   >
-                    Aún no se te cobrará nada
+                    Continúa para seleccionar tu método de pago
                   </Typography>
                 </Card>
               </Box>

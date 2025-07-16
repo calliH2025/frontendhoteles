@@ -68,7 +68,7 @@ const PerfilUsuario = () => {
     const fetchUserProfile = async () => {
       try {
         setIsLoading(true)
-        const response = await axios.get("https://backendd-q0zc.onrender.com/api/perfilusuario/", {
+        const response = await axios.get("https://backendreservas-m2zp.onrender.com/api/perfilusuario/", {
           headers: { Authorization: `Bearer ${token}` },
         })
         setUserData(response.data)
@@ -99,7 +99,7 @@ const PerfilUsuario = () => {
     const token = localStorage.getItem("token")
     try {
       setIsLoading(true)
-      await axios.put("https://backendd-q0zc.onrender.com/api/perfilusuario/", editedData, {
+      await axios.put("https://backendreservas-m2zp.onrender.com/api/perfilusuario/", editedData, {
         headers: { Authorization: `Bearer ${token}` },
       })
       setUserData({ ...userData, ...editedData })

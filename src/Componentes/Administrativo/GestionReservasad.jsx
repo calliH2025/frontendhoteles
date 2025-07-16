@@ -80,7 +80,7 @@ export default function GestionReservas() {
   useEffect(() => {
     const fetchReservas = async () => {
       try {
-        const response = await fetch('https://backendd-q0zc.onrender.com/api/gestionreservasadmin/list')
+        const response = await fetch('https://backendreservas-m2zp.onrender.com/api/gestionreservasadmin/list')
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`)
         const data = await response.json()
         if (data.error) throw new Error(data.error)
@@ -96,7 +96,7 @@ export default function GestionReservas() {
 
     const fetchHoteles = async () => {
       try {
-        const response = await fetch('https://backendd-q0zc.onrender.com/api/gestionreservasadmin/hotels')
+        const response = await fetch('https://backendreservas-m2zp.onrender.com/api/gestionreservasadmin/hotels')
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`)
         const data = await response.json()
         if (data.error) throw new Error(data.error)
@@ -189,7 +189,7 @@ export default function GestionReservas() {
 
   const confirmarEliminacion = async () => {
     try {
-      const response = await fetch(`https://backendd-q0zc.onrender.com/api/gestionreservasadmin/${dialogoEliminacion.reservaId}`, {
+      const response = await fetch(`https://backendreservas-m2zp.onrender.com/api/gestionreservasadmin/${dialogoEliminacion.reservaId}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error(`Error HTTP: ${response.status}`)

@@ -48,7 +48,7 @@ export default function HotelManagement() {
   const fetchHoteles = async () => {
     setLoading(true)
     try {
-      const response = await fetch('https://backendd-q0zc.onrender.com/api/gestionhoteles/list')
+      const response = await fetch('https://backendreservas-m2zp.onrender.com/api/gestionhoteles/list')
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       const data = await response.json()
       console.log("Respuesta del backend:", data)
@@ -77,8 +77,8 @@ export default function HotelManagement() {
   const toggleHotelVisibility = async (hotelId, isVisible) => {
     try {
       const endpoint = isVisible
-        ? `https://backendd-q0zc.onrender.com/api/gestionhoteles/hide/${hotelId}`
-        : `https://backendd-q0zc.onrender.com/api/gestionhoteles/unhide/${hotelId}`
+        ? `https://backendreservas-m2zp.onrender.com/api/gestionhoteles/hide/${hotelId}`
+        : `https://backendreservas-m2zp.onrender.com/api/gestionhoteles/unhide/${hotelId}`
       const response = await fetch(endpoint, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

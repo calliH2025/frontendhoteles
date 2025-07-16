@@ -20,9 +20,9 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Configurar el ícono personalizado rojo
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+// Configurar el ícono personalizado naranja
+const orangeIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -42,7 +42,7 @@ const DetallesHoteles = () => {
     const fetchHotel = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://backendd-q0zc.onrender.com/api/detallehotel/public/${id}`);
+        const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/detallehotel/public/${id}`);
         let imagenParsed = null;
         try {
           if (response.data.imagen) {
@@ -77,7 +77,7 @@ const DetallesHoteles = () => {
 
     const fetchComentarios = async () => {
       try {
-        const response = await axios.get(`https://backendd-q0zc.onrender.com/api/detallehotel/hotel/${id}`);
+        const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/detallehotel/hotel/${id}`);
         setComentarios(response.data);
       } catch (error) {
         console.error('Error al obtener comentarios:', error);
@@ -92,8 +92,8 @@ const DetallesHoteles = () => {
     width: '100%',
     height: '400px',
     borderRadius: '12px',
-    boxShadow: '0 8px 32px rgba(11, 117, 131, 0.15)',
-    border: '2px solid #b3c9ca',
+    boxShadow: '0 8px 32px rgba(255, 140, 0, 0.2)',
+    border: '2px solid #FFB347',
   };
 
   const center = hotel && hotel.latitud && hotel.longitud ? {
@@ -120,7 +120,7 @@ const DetallesHoteles = () => {
       <Box
         sx={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #b3c9ca 0%, #549c94 100%)',
+          background: '#ffffff',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -129,11 +129,12 @@ const DetallesHoteles = () => {
         <Card sx={{ 
           p: 4, 
           borderRadius: 3, 
-          boxShadow: '0 12px 40px rgba(11, 117, 131, 0.2)',
+          boxShadow: '0 12px 40px rgba(255, 140, 0, 0.3)',
           background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'blur(10px)',
+          border: '1px solid #FFB347'
         }}>
-          <Typography variant="h5" sx={{ color: '#0b7583', fontWeight: 600 }}>
+          <Typography variant="h5" sx={{ color: '#FF8C00', fontWeight: 600 }}>
             Cargando detalles del hotel...
           </Typography>
         </Card>
@@ -146,7 +147,7 @@ const DetallesHoteles = () => {
       <Box
         sx={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #b3c9ca 0%, #549c94 100%)',
+          background: '#ffffff',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -156,11 +157,12 @@ const DetallesHoteles = () => {
         <Card sx={{ 
           p: 4, 
           borderRadius: 3, 
-          boxShadow: '0 12px 40px rgba(243, 163, 132, 0.3)',
+          boxShadow: '0 12px 40px rgba(255, 140, 0, 0.3)',
           background: 'rgba(255, 255, 255, 0.95)',
-          maxWidth: 600
+          maxWidth: 600,
+          border: '1px solid #FFB347'
         }}>
-          <Typography variant="h5" sx={{ color: '#f3a384', fontWeight: 600, textAlign: 'center' }}>
+          <Typography variant="h5" sx={{ color: '#FF8C00', fontWeight: 600, textAlign: 'center' }}>
             {error}
           </Typography>
         </Card>
@@ -173,7 +175,7 @@ const DetallesHoteles = () => {
       <Box
         sx={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #b3c9ca 0%, #549c94 100%)',
+          background: '#ffffff',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -182,10 +184,11 @@ const DetallesHoteles = () => {
         <Card sx={{ 
           p: 4, 
           borderRadius: 3, 
-          boxShadow: '0 12px 40px rgba(11, 117, 131, 0.2)',
-          background: 'rgba(255, 255, 255, 0.95)'
+          boxShadow: '0 12px 40px rgba(255, 140, 0, 0.3)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          border: '1px solid #FFB347'
         }}>
-          <Typography variant="h5" sx={{ color: '#0b7583', fontWeight: 600 }}>
+          <Typography variant="h5" sx={{ color: '#FF8C00', fontWeight: 600 }}>
             No se encontró el hotel.
           </Typography>
         </Card>
@@ -207,20 +210,36 @@ const DetallesHoteles = () => {
           sx={{ 
             mb: 4, 
             borderRadius: 4,
-            background: 'linear-gradient(135deg, #0b7583 0%, #549c94 100%)',
-            boxShadow: '0 12px 40px rgba(11, 117, 131, 0.3)',
-            overflow: 'hidden'
+            backgroundImage: 'url(https://img.freepik.com/vector-gratis/salvapantallas-mexicano-colorido-pajaros_23-2148443473.jpg?semt=ais_hybrid&w=740)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            boxShadow: '0 12px 40px rgba(255, 140, 0, 0.4)',
+            overflow: 'hidden',
+            border: '2px solid #FFD700',
+            position: 'relative'
           }}
         >
-          <CardContent sx={{ p: 4, textAlign: 'center' }}>
+          {/* Overlay para mejorar la legibilidad del texto */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              
+            }}
+          />
+          <CardContent sx={{ p: 4, textAlign: 'center', position: 'relative', zIndex: 1 }}>
             <Typography
               variant="h3"
               sx={{
-                color: 'white',
+                color: 'black',
                 fontWeight: 700,
                 fontSize: { xs: '2rem', md: '3rem' },
                 letterSpacing: 1,
-                textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                textShadow: '3px 3px 6px rgba(0,0,0,0.5)',
                 mb: 1
               }}
             >
@@ -229,9 +248,10 @@ const DetallesHoteles = () => {
             <Typography
               variant="h6"
               sx={{
-                color: '#b3c9ca',
-                fontWeight: 400,
-                opacity: 0.9
+                color: '#1a0329',
+                fontWeight: 500,
+                opacity: 0.9,
+                textShadow: '2px 2px 4px rgba(0,0,0,0.4)'
               }}
             >
               Detalles completos del establecimiento
@@ -246,91 +266,92 @@ const DetallesHoteles = () => {
             <Card 
               sx={{ 
                 borderRadius: 3, 
-                boxShadow: '0 8px 32px rgba(11, 117, 131, 0.15)',
+                boxShadow: '0 8px 32px rgba(255, 140, 0, 0.2)',
                 background: 'rgba(255, 255, 255, 0.98)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(179, 201, 202, 0.3)'
+                border: '1px solid rgba(255, 179, 71, 0.3)'
               }}
             >
               <CardContent sx={{ p: 4 }}>
                 <Box sx={{ display: 'grid', gap: 3 }}>
                   {/* Nombre */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton sx={{ bgcolor: '#4c94bc', color: 'white', '&:hover': { bgcolor: '#0b7583' } }}>
+                    <IconButton sx={{ bgcolor: '#FF8C00', color: 'white', '&:hover': { bgcolor: '#2E0854' } }}>
                       <Hotel />
                     </IconButton>
                     <Box>
-                      <Typography variant="body2" sx={{ color: '#549c94', fontWeight: 600, fontSize: '0.7rem' }}>
+                      <Typography variant="body2" sx={{ color: '#2E0854', fontWeight: 600, fontSize: '0.7rem' }}>
                         NOMBRE DEL HOTEL
                       </Typography>
-                      <Typography variant="body1" sx={{ color: '#0b7583', fontWeight: 600, fontSize: '1rem' }}>
+                      <Typography variant="body1" sx={{ color: '#FF8C00', fontWeight: 600, fontSize: '1rem' }}>
                         {hotel.nombrehotel}
                       </Typography>
                     </Box>
                   </Box>
 
-                  <Divider sx={{ borderColor: '#b3c9ca', opacity: 0.3 }} />
+                  <Divider sx={{ borderColor: '#FFB347', opacity: 0.5 }} />
 
                   {/* Dirección */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton sx={{ bgcolor: '#549c94', color: 'white', '&:hover': { bgcolor: '#0b7583' } }}>
+                    <IconButton sx={{ bgcolor: '#2E0854', color: 'white', '&:hover': { bgcolor: '#FF8C00' } }}>
                       <Home />
                     </IconButton>
                     <Box>
-                      <Typography variant="body2" sx={{ color: '#549c94', fontWeight: 600, fontSize: '0.7rem' }}>
+                      <Typography variant="body2" sx={{ color: '#2E0854', fontWeight: 600, fontSize: '0.7rem' }}>
                         DIRECCIÓN
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#0b7583', fontWeight: 500, fontSize: '0.9rem' }}>
+                      <Typography variant="body2" sx={{ color: '#FF8C00', fontWeight: 500, fontSize: '0.9rem' }}>
                         {hotel.direccion || 'Sin dirección disponible'}
                       </Typography>
                     </Box>
                   </Box>
 
-                  <Divider sx={{ borderColor: '#b3c9ca', opacity: 0.3 }} />
+                  <Divider sx={{ borderColor: '#FFB347', opacity: 0.5 }} />
 
                   {/* Contacto */}
                   <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <IconButton sx={{ bgcolor: '#f3a384', color: 'white', '&:hover': { bgcolor: '#0b7583' } }}>
+                      <IconButton sx={{ bgcolor: '#9A4C95', color: 'white', '&:hover': { bgcolor: '#FF8C00' } }}>
                         <Phone />
                       </IconButton>
                       <Box>
-                        <Typography variant="body2" sx={{ color: '#549c94', fontWeight: 600, fontSize: '0.7rem' }}>
+                        <Typography variant="body2" sx={{ color: '#2E0854', fontWeight: 600, fontSize: '0.7rem' }}>
                           TELÉFONO
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#0b7583', fontWeight: 500, fontSize: '0.9rem' }}>
+                        <Typography variant="body2" sx={{ color: '#FF8C00', fontWeight: 500, fontSize: '0.9rem' }}>
                           {hotel.telefono || 'No disponible'}
                         </Typography>
                       </Box>
                     </Box>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <IconButton sx={{ bgcolor: '#4c94bc', color: 'white', '&:hover': { bgcolor: '#0b7583' } }}>
+                      <IconButton sx={{ bgcolor: '#FFB347', color: '#2E0854', '&:hover': { bgcolor: '#FF8C00', color: 'white' } }}>
                         <Email />
                       </IconButton>
                       <Box>
-                        <Typography variant="body2" sx={{ color: '#549c94', fontWeight: 600, fontSize: '0.7rem' }}>
+                        <Typography variant="body2" sx={{ color: '#2E0854', fontWeight: 600, fontSize: '0.7rem' }}>
                           CORREO ELECTRÓNICO
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#0b7583', fontWeight: 500, fontSize: '0.9rem' }}>
+                        <Typography variant="body2" sx={{ color: '#FF8C00', fontWeight: 500, fontSize: '0.9rem' }}>
                           {hotel.correo || 'No disponible'}
                         </Typography>
                       </Box>
                     </Box>
                   </Box>
 
-                  <Divider sx={{ borderColor: '#b3c9ca', opacity: 0.3 }} />
+                  <Divider sx={{ borderColor: '#FFB347', opacity: 0.5 }} />
 
                   {/* Habitaciones */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Chip 
                       label={`${hotel.numhabitacion} Habitaciones`}
                       sx={{ 
-                        bgcolor: '#549c94', 
+                        bgcolor: '#2E0854', 
                         color: 'white', 
                         fontWeight: 600,
                         fontSize: '1rem',
-                        px: 2
+                        px: 2,
+                        '&:hover': { bgcolor: '#9A4C95' }
                       }}
                     />
                   </Box>
@@ -338,25 +359,25 @@ const DetallesHoteles = () => {
                   {/* Descripción */}
                   {hotel.descripcion && (
                     <>
-                      <Divider sx={{ borderColor: '#b3c9ca', opacity: 0.3 }} />
+                      <Divider sx={{ borderColor: '#FFB347', opacity: 0.5 }} />
                       <Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                          <IconButton sx={{ bgcolor: '#0b7583', color: 'white' }}>
+                          <IconButton sx={{ bgcolor: '#FF8C00', color: 'white' }}>
                             <Info />
                           </IconButton>
-                          <Typography variant="body1" sx={{ color: '#0b7583', fontWeight: 600, fontSize: '1rem' }}>
+                          <Typography variant="body1" sx={{ color: '#2E0854', fontWeight: 600, fontSize: '1rem' }}>
                             Descripción
                           </Typography>
                         </Box>
                         <Typography 
                           variant="body1" 
                           sx={{ 
-                            color: '#549c94', 
+                            color: '#2E0854', 
                             lineHeight: 1.6,
-                            backgroundColor: 'rgba(179, 201, 202, 0.1)',
+                            backgroundColor: 'rgba(255, 179, 71, 0.1)',
                             p: 3,
                             borderRadius: 2,
-                            borderLeft: '4px solid #4c94bc'
+                            borderLeft: '4px solid #FF8C00'
                           }}
                         >
                           {hotel.descripcion}
@@ -368,25 +389,25 @@ const DetallesHoteles = () => {
                   {/* Servicios */}
                   {hotel.servicios && (
                     <>
-                      <Divider sx={{ borderColor: '#b3c9ca', opacity: 0.3 }} />
+                      <Divider sx={{ borderColor: '#FFB347', opacity: 0.5 }} />
                       <Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                          <IconButton sx={{ bgcolor: '#f3a384', color: 'white' }}>
+                          <IconButton sx={{ bgcolor: '#9A4C95', color: 'white' }}>
                             <RoomService />
                           </IconButton>
-                          <Typography variant="body1" sx={{ color: '#0b7583', fontWeight: 600, fontSize: '1rem' }}>
+                          <Typography variant="body1" sx={{ color: '#2E0854', fontWeight: 600, fontSize: '1rem' }}>
                             Servicios
                           </Typography>
                         </Box>
                         <Typography 
                           variant="body1" 
                           sx={{ 
-                            color: '#549c94', 
+                            color: '#2E0854', 
                             lineHeight: 1.6,
-                            backgroundColor: 'rgba(243, 163, 132, 0.1)',
+                            backgroundColor: 'rgba(154, 76, 149, 0.1)',
                             p: 3,
                             borderRadius: 2,
-                            borderLeft: '4px solid #f3a384'
+                            borderLeft: '4px solid #9A4C95'
                           }}
                         >
                           {hotel.servicios}
@@ -404,10 +425,11 @@ const DetallesHoteles = () => {
             <Card 
               sx={{ 
                 borderRadius: 3, 
-                boxShadow: '0 8px 32px rgba(11, 117, 131, 0.15)',
+                boxShadow: '0 8px 32px rgba(255, 140, 0, 0.2)',
                 overflow: 'hidden',
                 background: 'rgba(255, 255, 255, 0.98)',
-                height: 'fit-content'
+                height: 'fit-content',
+                border: '2px solid #FFB347'
               }}
             >
               {hotel.imagen && hotel.imagen.data && hotel.imagen.mimeType ? (
@@ -426,7 +448,7 @@ const DetallesHoteles = () => {
                   sx={{
                     width: '100%',
                     height: '550px',
-                    bgcolor: 'linear-gradient(135deg, #b3c9ca 0%, #549c94 100%)',
+                    background: 'linear-gradient(135deg, #2E0854 0%, #9A4C95 50%, #FF8C00 100%)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
@@ -434,8 +456,8 @@ const DetallesHoteles = () => {
                     color: 'white'
                   }}
                 >
-                  <Hotel sx={{ fontSize: 60, mb: 2, opacity: 0.7 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 500, opacity: 0.8 }}>
+                  <Hotel sx={{ fontSize: 60, mb: 2, opacity: 0.8 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 500, opacity: 0.9 }}>
                     Imagen no disponible
                   </Typography>
                 </Box>
@@ -452,18 +474,20 @@ const DetallesHoteles = () => {
             startIcon={<Hotel />}
             onClick={handleViewRooms}
             sx={{ 
-              bgcolor: '#549c94',
-              color: 'white',
-              fontWeight: 600,
+              background: 'linear-gradient(135deg, #FF8C00 0%, #FFB347 100%)',
+              color: '#2E0854',
+              fontWeight: 700,
               fontSize: '1.1rem',
               px: 4,
               py: 1.5,
               borderRadius: 3,
               textTransform: 'none',
-              boxShadow: '0 8px 24px rgba(84, 156, 148, 0.4)',
+              boxShadow: '0 8px 24px rgba(255, 140, 0, 0.4)',
+              border: '2px solid #FFD700',
               '&:hover': {
-                bgcolor: '#0b7583',
-                boxShadow: '0 12px 32px rgba(11, 117, 131, 0.5)',
+                background: 'linear-gradient(135deg, #2E0854 0%, #9A4C95 100%)',
+                color: 'white',
+                boxShadow: '0 12px 32px rgba(46, 8, 84, 0.5)',
                 transform: 'translateY(-2px)'
               },
               transition: 'all 0.3s ease'
@@ -478,20 +502,21 @@ const DetallesHoteles = () => {
           sx={{ 
             mt: 3, 
             borderRadius: 2,
-            boxShadow: '0 4px 16px rgba(11, 117, 131, 0.1)',
+            boxShadow: '0 4px 16px rgba(255, 140, 0, 0.2)',
             background: 'rgba(255, 255, 255, 0.98)',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            border: '1px solid #FFB347'
           }}
         >
           <CardContent sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
               <IconButton 
                 sx={{ 
-                  bgcolor: '#0b7583', 
+                  bgcolor: '#FF8C00', 
                   color: 'white', 
                   mr: 2,
                   size: 'small',
-                  '&:hover': { bgcolor: '#549c94' }
+                  '&:hover': { bgcolor: '#2E0854' }
                 }}
               >
                 <LocationOn fontSize="small" />
@@ -500,7 +525,7 @@ const DetallesHoteles = () => {
                 variant="h6" 
                 sx={{ 
                   fontWeight: 600, 
-                  color: '#0b7583',
+                  color: '#2E0854',
                   fontSize: '1.1rem'
                 }}
               >
@@ -513,7 +538,7 @@ const DetallesHoteles = () => {
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                 attribution='© <a href="https://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
               />
-              <Marker position={[center.lat, center.lng]} icon={redIcon}>
+              <Marker position={[center.lat, center.lng]} icon={orangeIcon}>
                 <Popup>{hotel.nombrehotel}</Popup>
               </Marker>
             </MapContainer>
@@ -525,17 +550,19 @@ const DetallesHoteles = () => {
                 startIcon={<Directions />}
                 onClick={() => window.open(getGoogleMapsLink(), '_blank')}
                 sx={{ 
-                  background: 'linear-gradient(135deg, #549c94 0%, #4c94bc 100%)',
+                  background: 'linear-gradient(135deg, #2E0854 0%, #9A4C95 100%)',
                   color: 'white',
                   fontWeight: 600,
                   px: 4,
                   py: 1.5,
                   borderRadius: 3,
                   textTransform: 'none',
-                  boxShadow: '0 6px 20px rgba(84, 156, 148, 0.4)',
+                  boxShadow: '0 6px 20px rgba(46, 8, 84, 0.4)',
+                  border: '1px solid #FFB347',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #4c94bc 0%, #0b7583 100%)',
-                    boxShadow: '0 8px 28px rgba(76, 148, 188, 0.5)',
+                    background: 'linear-gradient(135deg, #FF8C00 0%, #FFB347 100%)',
+                    color: '#2E0854',
+                    boxShadow: '0 8px 28px rgba(255, 140, 0, 0.5)',
                     transform: 'translateY(-1px)'
                   },
                   transition: 'all 0.3s ease'
@@ -548,39 +575,54 @@ const DetallesHoteles = () => {
         </Card>
 
         {/* Sección de comentarios */}
-<Box sx={{ mt: 4 }}>
-  <Typography variant="h5" sx={{ color: '#0b7583', fontWeight: 600, mb: 2 }}>
-    Comentarios de los Clientes
-  </Typography>
-  <Grid container spacing={2}>
-    {comentarios.map((comentario) => (
-      <Grid item xs={12} key={comentario.id_comentario}>
-        <Card sx={{ p: 2, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>
-              <PersonIcon sx={{ color: '#0b7583', mr: 1, fontSize: '18px', mt: 0.2 }} />
-              <Box>
-                <Typography variant="body2" sx={{ fontWeight: 500, color: '#0b7583' }}>
-                  {comentario.Nombre} {comentario.ApellidoP} {comentario.ApellidoM}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {new Date(comentario.fecha).toLocaleDateString()}
-                </Typography>
-              </Box>
-            </Box>
-            <Rating value={comentario.calificacion} readOnly sx={{ mb: 1 }} />
-            <Typography variant="body1" sx={{ color: '#000', lineHeight: 1.5 }}>
-              {comentario.comentario}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-    ))}
-    {comentarios.length === 0 && (
-      <Typography variant="body2" sx={{ color: '#888', textAlign: 'center', mt: 2 }}>
-        No hay comentarios disponibles.
-      </Typography>
-    )}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" sx={{ color: '#2E0854', fontWeight: 600, mb: 2, textAlign: 'center' }}>
+            Comentarios de los Clientes
+          </Typography>
+          <Grid container spacing={2}>
+            {comentarios.map((comentario) => (
+              <Grid item xs={12} key={comentario.id_comentario}>
+                <Card sx={{ 
+                  p: 2, 
+                  borderRadius: 2, 
+                  boxShadow: '0 4px 12px rgba(255, 140, 0, 0.15)',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid rgba(255, 179, 71, 0.3)'
+                }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>
+                      <PersonIcon sx={{ color: '#FF8C00', mr: 1, fontSize: '18px', mt: 0.2 }} />
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500, color: '#2E0854' }}>
+                          {comentario.Nombre} {comentario.ApellidoP} {comentario.ApellidoM}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#9A4C95' }}>
+                          {new Date(comentario.fecha).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Rating 
+                      value={comentario.calificacion} 
+                      readOnly 
+                      sx={{ 
+                        mb: 1,
+                        '& .MuiRating-iconFilled': {
+                          color: '#FF8C00'
+                        }
+                      }} 
+                    />
+                    <Typography variant="body1" sx={{ color: '#2E0854', lineHeight: 1.5 }}>
+                      {comentario.comentario}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+            {comentarios.length === 0 && (
+              <Typography variant="body2" sx={{ color: '#9A4C95', textAlign: 'center', mt: 2, width: '100%' }}>
+                No hay comentarios disponibles.
+              </Typography>
+            )}
           </Grid>
         </Box>
       </Container>

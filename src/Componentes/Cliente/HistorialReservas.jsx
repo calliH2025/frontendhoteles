@@ -110,8 +110,8 @@ export default function MisReservas() {
       if (!id_usuario) return;
 
       const [confirmedResponse, expiredResponse] = await Promise.all([
-        axios.get(`http://localhost:3000/api/reservas/usuario/${id_usuario}/confirmed`),
-        axios.get(`http://localhost:3000/api/reservas/usuario/${id_usuario}/expired`),
+        axios.get(`https://backendreservas-m2zp.onrender.com/api/reservas/usuario/${id_usuario}/confirmed`),
+        axios.get(`https://backendreservas-m2zp.onrender.com/api/reservas/usuario/${id_usuario}/expired`),
       ]);
 
       console.log("Reservas Confirmadas Crudas:", confirmedResponse.data);
@@ -146,7 +146,7 @@ export default function MisReservas() {
 
     if (result.isConfirmed) {
       try {
-        const response = await axios.put(`http://localhost:3000/api/reservas/${id_reserva}/cancelar`);
+        const response = await axios.put(`https://backendreservas-m2zp.onrender.com/api/reservas/${id_reserva}/cancelar`);
         if (response.status === 200 && response.data.confirmCancel) {
           setConfirmedReservations((prev) => prev.filter((res) => res.id_reserva !== id_reserva));
           setReservationSuccess("Reserva cancelada exitosamente en el sistema.");

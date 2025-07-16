@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
@@ -124,7 +122,7 @@ const HotelesC = () => {
   const fetchHoteles = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("http://localhost:3000/api/detallehotel/public")
+      const response = await axios.get("https://backendreservas-m2zp.onrender.com/api/detallehotel/public")
       const hotelesData = response.data.map((hotel) => {
         let imagenParsed = { data: null, mimeType: "image/jpeg" }
         try {

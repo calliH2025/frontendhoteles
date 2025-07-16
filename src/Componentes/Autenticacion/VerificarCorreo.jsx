@@ -40,7 +40,7 @@ const theme = createTheme({
 });
 
 // URL base del backend
-const API_BASE_URL = "https://backendd-q0zc.onrender.com";
+const API_BASE_URL = "https://backendreservas-m2zp.onrender.com"; // Cambia esto a tu URL de API real
 
 function VerificarCorreo() {
     const [verificationCode, setVerificationCode] = useState("");

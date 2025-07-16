@@ -21,11 +21,13 @@ import {
 import { LocationOn, StarBorder, Star, Visibility, Room } from '@mui/icons-material';
 
 const colors = {
-  primary: '#4c94bc',
-  accent: '#f3a384',
-  dark: '#0b7583',
-  secondary: '#549c94',
-  light: '#b3c9ca',
+  primary: '#FF6B35',      // Naranja vibrante
+  accent: '#8B4C99',       // Morado profundo
+  dark: '#2D1B39',         // Negro-morado oscuro
+  secondary: '#E85A4F',    // Naranja-rojizo
+  light: '#F4E4C1',       // Crema cálido
+  gold: '#FFB347',        // Dorado suave
+  deepPurple: '#4A1A4A',  // Morado muy oscuro
 };
 
 const HotelesP = () => {
@@ -54,7 +56,7 @@ const HotelesP = () => {
 
   const fetchHoteles = async () => {
     try {
-      const response = await axios.get('https://backendd-q0zc.onrender.com/api/detallehotel/public');
+      const response = await axios.get('https://backendreservas-m2zp.onrender.com/api/detallehotel/public');
       const hotelesData = response.data.map(hotel => {
         let imagenParsed = { data: null, mimeType: 'image/jpeg' };
         try {
@@ -69,10 +71,10 @@ const HotelesP = () => {
             }
           }
           if (!imagenParsed.data) {
-            imagenParsed.data = 'https://via.placeholder.com/320x180/4c94bc/ffffff?text=Hotel+Premium';
+            imagenParsed.data = 'https://via.placeholder.com/320x180/FF6B35/ffffff?text=Hotel+Premium';
           }
         } catch (error) {
-          imagenParsed.data = 'https://via.placeholder.com/320x180/4c94bc/ffffff?text=Hotel+Premium';
+          imagenParsed.data = 'https://via.placeholder.com/320x180/FF6B35/ffffff?text=Hotel+Premium';
           console.warn('Error al parsear imagen para hotel', hotel.id_hotel, error);
         }
         return {
@@ -119,8 +121,13 @@ const HotelesP = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FDF7F0',
         py: 4,
+        backgroundImage: `
+          radial-gradient(circle at 20% 20%, ${colors.light}30 0%, transparent 30%),
+          radial-gradient(circle at 80% 80%, ${colors.primary}10 0%, transparent 30%),
+          radial-gradient(circle at 40% 60%, ${colors.accent}08 0%, transparent 30%)
+        `,
       }}
     >
       {/* Header Section */}
@@ -128,12 +135,19 @@ const HotelesP = () => {
         <Paper
           elevation={0}
           sx={{
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
-            borderRadius: 3,
-            p: 3,
+            background: `
+              linear-gradient(135deg, ${colors.primary}95 0%, ${colors.accent}95 50%, ${colors.dark}95 100%),
+              url('https://img.freepik.com/vector-gratis/salvapantallas-mexicano-colorido-pajaros_23-2148443473.jpg')
+            `,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            borderRadius: 4,
+            p: 4,
             textAlign: 'center',
             position: 'relative',
             overflow: 'hidden',
+            border: `2px solid ${colors.gold}40`,
             '&::before': {
               content: '""',
               position: 'absolute',
@@ -141,45 +155,63 @@ const HotelesP = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: `radial-gradient(circle at 30% 20%, ${colors.accent}20 0%, transparent 50%)`,
+              
+            },
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              top: -10,
+              left: -10,
+              right: -10,
+              bottom: -10,
+             
+              borderRadius: 4,
+              zIndex: -1,
             }
           }}
         >
           <Typography
             variant="h2"
             sx={{
-              color: '#ffffff',
-              fontWeight: 800,
-              mb: 1.5,
-              fontSize: { xs: '2rem', md: '2.8rem' },
-              letterSpacing: 1.2,
+              color: '#000000',
+              fontWeight: 900,
+              mb: 2,
+              fontSize: { xs: '2.2rem', md: '3rem' },
+              letterSpacing: 1.5,
               position: 'relative',
-              zIndex: 1,
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              zIndex: 2,
+              textShadow: '0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(255,255,255,0.6)',
+              fontFamily: '"Playfair Display", serif',
             }}
           >
-            Hoteles Exclusivos
+            Hoteles Xantolo
           </Typography>
           <Typography
             variant="h6"
             sx={{
-              color: colors.light,
-              fontWeight: 400,
+              color: '#000000',
+              fontWeight: 600,
               position: 'relative',
-              zIndex: 1,
+              zIndex: 2,
               maxWidth: 600,
               mx: 'auto',
-              fontSize: { xs: '0.9rem', md: '1.1rem' },
+              fontSize: { xs: '1rem', md: '1.2rem' },
+              textShadow: '0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(255,255,255,0.6)',
+              fontStyle: 'italic',
+              
+              padding: '8px 16px',
+              borderRadius: 2,
+              backdropFilter: 'blur(4px)',
             }}
           >
-            Descubre experiencias únicas en nuestros destinos cuidadosamente seleccionados
+            Experiencias únicas en la tradición del Día de los Muertos
           </Typography>
         </Paper>
       </Container>
 
       {/* Hotels Grid - Centrado */}
       <Container maxWidth="xl">
-        <Grid container spacing={2.5} justifyContent="center">
+        <Grid container spacing={3} justifyContent="center">
           {hoteles.map((hotel) => (
             <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={hotel.id}>
               <Card
@@ -187,33 +219,44 @@ const HotelesP = () => {
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
-                  borderRadius: 2.5,
+                  borderRadius: 3,
                   overflow: 'hidden',
-                  boxShadow: `0 6px 24px rgba(75, 148, 188, 0.12)`,
+                  boxShadow: `0 8px 32px rgba(255, 107, 53, 0.15)`,
                   transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
                   bgcolor: '#ffffff',
-                  border: `1px solid ${colors.light}40`,
+                  border: `2px solid ${colors.gold}30`,
                   position: 'relative',
                   '&:hover': {
-                    transform: 'translateY(-8px) scale(1.02)',
-                    boxShadow: `0 16px 32px rgba(75, 148, 188, 0.2)`,
+                    transform: 'translateY(-10px) scale(1.02)',
+                    boxShadow: `0 20px 40px rgba(139, 76, 153, 0.25)`,
+                    border: `2px solid ${colors.gold}60`,
                     '& .hotel-image': {
-                      transform: 'scale(1.08)',
+                      transform: 'scale(1.1)',
                     },
                     '& .hotel-overlay': {
                       opacity: 1,
                     }
                   },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent}, ${colors.gold})`,
+                    zIndex: 1,
+                  }
                 }}
               >
                 <Box sx={{ position: 'relative', overflow: 'hidden' }}>
                   <CardMedia
                     component="img"
-                    height="180"
+                    height="200"
                     image={
                       hotel.imagen && hotel.imagen.data && hotel.imagen.mimeType
                         ? `data:${hotel.imagen.mimeType};base64,${hotel.imagen.data}`
-                        : 'https://via.placeholder.com/320x180/4c94bc/ffffff?text=Hotel+Premium'
+                        : 'https://via.placeholder.com/320x200/FF6B35/ffffff?text=Hotel+Premium'
                     }
                     alt={hotel.nombrehotel}
                     onClick={() => handleImageClick(hotel)}
@@ -222,6 +265,7 @@ const HotelesP = () => {
                       cursor: 'pointer',
                       objectFit: 'cover',
                       transition: 'transform 0.5s ease',
+                      filter: 'brightness(0.95) contrast(1.05)',
                     }}
                   />
                   <Box
@@ -232,7 +276,7 @@ const HotelesP = () => {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: `linear-gradient(45deg, ${colors.dark}80, ${colors.primary}60)`,
+                      background: `linear-gradient(45deg, ${colors.dark}85, ${colors.accent}70)`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -243,68 +287,72 @@ const HotelesP = () => {
                     <IconButton
                       onClick={() => handleImageClick(hotel)}
                       sx={{
-                        bgcolor: colors.accent,
-                        color: '#ffffff',
-                        size: 'small',
+                        bgcolor: colors.gold,
+                        color: colors.dark,
+                        size: 'medium',
                         '&:hover': {
-                          bgcolor: colors.accent,
-                          transform: 'scale(1.1)',
-                        }
+                          bgcolor: colors.primary,
+                          color: '#ffffff',
+                          transform: 'scale(1.15)',
+                        },
+                        boxShadow: `0 4px 12px rgba(0,0,0,0.3)`,
                       }}
                     >
-                      <Visibility fontSize="small" />
+                      <Visibility fontSize="medium" />
                     </IconButton>
                   </Box>
                 </Box>
 
-                <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
                   <Typography
                     variant="h6"
                     component="div"
                     sx={{
-                      fontWeight: 700,
+                      fontWeight: 800,
                       color: colors.dark,
-                      mb: 1,
-                      fontSize: '1.1rem',
-                      lineHeight: 1.2,
+                      mb: 1.5,
+                      fontSize: '1.2rem',
+                      lineHeight: 1.3,
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
+                      fontFamily: '"Playfair Display", serif',
                     }}
                   >
                     {hotel.nombrehotel}
                   </Typography>
                   
                   {hotel.promociones && hotel.promociones.length > 0 && (
-                    <Box sx={{ mb: 1 }}>
+                    <Box sx={{ mb: 1.5 }}>
                       {hotel.promociones.map((promo, index) => (
                         <Chip
                           key={index}
-                          label={`¡Promoción Activa! ${promo.descuento}%`}
+                          label={`¡Promoción Especial! ${promo.descuento}%`}
                           size="small"
                           sx={{
-                            bgcolor: '#ff4444',
+                            bgcolor: colors.secondary,
                             color: '#ffffff',
-                            fontWeight: 600,
-                            borderRadius: 1,
-                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            borderRadius: 2,
+                            fontSize: '0.75rem',
                             mb: 0.5,
-                            height: 20,
+                            height: 22,
+                            boxShadow: `0 2px 8px rgba(232, 90, 79, 0.3)`,
                           }}
                         />
                       ))}
                     </Box>
                   )}
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                    <Room sx={{ color: colors.secondary, mr: 0.5, fontSize: '0.9rem' }} />
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Room sx={{ color: colors.accent, mr: 0.5, fontSize: '1rem' }} />
                     <Typography
                       variant="body2"
                       sx={{
-                        color: colors.secondary,
-                        fontWeight: 500,
-                        fontSize: '0.8rem',
+                        color: colors.deepPurple,
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
                         display: '-webkit-box',
                         WebkitLineClamp: 1,
                         WebkitBoxOrient: 'vertical',
@@ -315,19 +363,20 @@ const HotelesP = () => {
                     </Typography>
                   </Box>
 
-                  <Divider sx={{ my: 1.5, borderColor: colors.light }} />
+                  <Divider sx={{ my: 2, borderColor: colors.gold, opacity: 0.5 }} />
 
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                     <Chip
-                      label={`${hotel.numhabitacion} Hab.`}
+                      label={`${hotel.numhabitacion} Habitaciones`}
                       size="small"
                       sx={{
-                        bgcolor: colors.secondary,
+                        bgcolor: colors.accent,
                         color: '#ffffff',
-                        fontWeight: 600,
-                        borderRadius: 1.5,
-                        fontSize: '0.7rem',
-                        height: 24,
+                        fontWeight: 700,
+                        borderRadius: 2,
+                        fontSize: '0.75rem',
+                        height: 26,
+                        boxShadow: `0 2px 8px rgba(139, 76, 153, 0.3)`,
                       }}
                     />
                     <Rating
@@ -339,53 +388,65 @@ const HotelesP = () => {
                       emptyIcon={<StarBorder fontSize="inherit" />}
                       icon={<Star fontSize="inherit" />}
                       sx={{ 
-                        color: colors.accent,
+                        color: colors.gold,
                         '& .MuiRating-icon': {
-                          fontSize: '1rem',
+                          fontSize: '1.1rem',
+                        },
+                        '& .MuiRating-iconFilled': {
+                          color: colors.gold,
+                        },
+                        '& .MuiRating-iconEmpty': {
+                          color: colors.light,
                         }
                       }}
                     />
                   </Box>
                 </CardContent>
 
-                <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+                <CardActions sx={{ p: 2.5, pt: 0, gap: 1.5 }}>
                   <Button
                     variant="contained"
                     onClick={() => handleDetailsClick(hotel)}
-                    size="small"
+                    size="medium"
                     sx={{
                       flex: 1,
-                      borderRadius: 1.5,
+                      borderRadius: 2,
                       textTransform: 'none',
-                      py: 0.8,
-                      fontWeight: 600,
-                      fontSize: '0.8rem',
+                      py: 1,
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
                       bgcolor: colors.primary,
+                      background: `linear-gradient(45deg, ${colors.primary}, ${colors.secondary})`,
                       '&:hover': {
-                        bgcolor: colors.dark,
-                        transform: 'translateY(-1px)',
+                        background: `linear-gradient(45deg, ${colors.secondary}, ${colors.accent})`,
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 6px 20px rgba(255, 107, 53, 0.4)`,
                       },
                       transition: 'all 0.3s ease',
+                      boxShadow: `0 4px 12px rgba(255, 107, 53, 0.3)`,
                     }}
                   >
                     Ver Detalles
                   </Button>
-                  <Tooltip title="Ver ubicación">
+                  <Tooltip title="Ver ubicación" arrow>
                     <IconButton
                       onClick={() => handleLocationClick(hotel)}
-                      size="small"
+                      size="medium"
                       sx={{
                         bgcolor: colors.light,
                         color: colors.dark,
+                        border: `2px solid ${colors.gold}40`,
                         '&:hover': {
-                          bgcolor: colors.secondary,
-                          color: '#ffffff',
-                          transform: 'scale(1.05)',
+                          bgcolor: colors.gold,
+                          color: colors.dark,
+                          border: `2px solid ${colors.gold}80`,
+                          transform: 'scale(1.1)',
+                          boxShadow: `0 4px 12px rgba(255, 179, 71, 0.4)`,
                         },
                         transition: 'all 0.3s ease',
                       }}
                     >
-                      <LocationOn fontSize="small" />
+                      <LocationOn fontSize="medium" />
                     </IconButton>
                   </Tooltip>
                 </CardActions>

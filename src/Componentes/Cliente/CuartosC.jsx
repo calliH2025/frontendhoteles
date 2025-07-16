@@ -136,7 +136,7 @@ const CuartosP = ({ idHotel }) => {
 
   const fetchCuartos = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/detallesHabitacion/hotel/${idHotel}`);
+      const response = await axios.get(`https://backendreservas-m2zp.onrender.com/api/detallesHabitacion/hotel/${idHotel}`);
       const cuartosData = response.data.map(cuarto => {
         let imagenParsed = null;
         try {

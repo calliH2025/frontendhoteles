@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -208,7 +206,7 @@ const DetallesHabitacion = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://backendd-q0zc.onrender.com/api/detallesHabitacion/detalles/${idHabitacion}`
+        `https://backendreservas-m2zp.onrender.com/api/detallesHabitacion/detalles/${idHabitacion}`
       );
       console.log('Datos de habitación:', response.data);
       setHabitacion(response.data);
@@ -302,7 +300,7 @@ const DetallesHabitacion = () => {
 
     try {
       const response = await axios.post(
-        `https://backendd-q0zc.onrender.com/api/reservas/calculate-total`,
+        `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
         {
           id_habitacion: parseInt(idHabitacion),
           fechainicio: startDate.toISOString(),
@@ -378,7 +376,7 @@ const DetallesHabitacion = () => {
 
     try {
       const response = await axios.post(
-        `https://backendd-q0zc.onrender.com/api/reservas`,
+        `https://backendreservas-m2zp.onrender.com/api/reservas`,
         {
           id_habitacion: parseInt(idHabitacion),
           fechainicio: startDate.toISOString(),

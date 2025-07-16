@@ -59,8 +59,8 @@ export default function GestionUsuarios() {
     setIsFetching(true);
     try {
       const [clientesResp, propietariosResp] = await Promise.all([
-        fetch("https://backendd-q0zc.onrender.com/api/gestionusuarios/list/Cliente").then((res) => res.json()),
-        fetch("https://backendd-q0zc.onrender.com/api/gestionusuarios/list/Propietario").then((res) => res.json()),
+        fetch("https://backendreservas-m2zp.onrender.com/api/gestionusuarios/list/Cliente").then((res) => res.json()),
+        fetch("https://backendreservas-m2zp.onrender.com/api/gestionusuarios/list/Propietario").then((res) => res.json()),
       ]);
       const mappedClientes = clientesResp.map((user) => ({
         id: user.id,
@@ -98,7 +98,7 @@ export default function GestionUsuarios() {
     const newStatus = currentStatus === "active" ? "inactivo" : "activo";
     setActionLoading((prev) => ({ ...prev, [userId]: true }));
     try {
-      const response = await fetch(`https://backendd-q0zc.onrender.com/api/gestionusuarios/toggle/${userId}`, {
+      const response = await fetch(`https://backendreservas-m2zp.onrender.com/api/gestionusuarios/toggle/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ estado: newStatus }),
@@ -129,7 +129,7 @@ export default function GestionUsuarios() {
   const deleteUser = async (userId) => {
     setActionLoading((prev) => ({ ...prev, [`delete_${userId}`]: true }));
     try {
-      await fetch(`https://backendd-q0zc.onrender.com/api/gestionusuarios/delete/${userId}`, { method: "DELETE" });
+      await fetch(`https://backendreservas-m2zp.onrender.com/api/gestionusuarios/delete/${userId}`, { method: "DELETE" });
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
       setSuccess(`Usuario ${userId} eliminado exitosamente`);
       setTimeout(() => setSuccess(""), 3000);
