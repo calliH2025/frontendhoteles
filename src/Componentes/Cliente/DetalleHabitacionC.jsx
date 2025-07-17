@@ -262,7 +262,7 @@ const DetallesHabitacion = () => {
         err.response?.status === 404
           ? "Habitación no encontrada en la base de datos."
           : err.response?.data?.error ||
-            "Error al cargar los detalles de la habitación. Intente de nuevo.";
+          "Error al cargar los detalles de la habitación. Intente de nuevo.";
       setError(errorMessage);
       console.error("Error al obtener habitación:", err.response?.data || err.message);
     } finally {
@@ -399,7 +399,6 @@ const DetallesHabitacion = () => {
       state: {
         id_usuario,
         id_habitacion: parseInt(idHabitacion),
-        id_hotel: habitacion.id_hotel, // Asegúrate de que este campo exista en los datos de habitacion
         fechainicio: startDate.toISOString(),
         fechafin: endDate.toISOString(),
         tipo_tarifa,
@@ -541,13 +540,13 @@ const DetallesHabitacion = () => {
 
   const images =
     habitacion.imagenes &&
-    Array.isArray(habitacion.imagenes) &&
-    habitacion.imagenes.length > 0
+      Array.isArray(habitacion.imagenes) &&
+      habitacion.imagenes.length > 0
       ? habitacion.imagenes
-          .map((img) =>
-            img.data && img.mimeType ? `data:${img.mimeType};base64,${img.data}` : null
-          )
-          .filter((img) => img)
+        .map((img) =>
+          img.data && img.mimeType ? `data:${img.mimeType};base64,${img.data}` : null
+        )
+        .filter((img) => img)
       : null;
   const normalizedEstado =
     habitacion.estado?.charAt(0).toUpperCase() +

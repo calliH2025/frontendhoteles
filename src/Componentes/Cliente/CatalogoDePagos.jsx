@@ -399,47 +399,54 @@ const CatalogoPagos = () => {
     setSelectedMethod(event.target.value);
   };
 
-  const handleContinue = async () => {
-    if (!selectedMethod) {
-      setError("Por favor, selecciona un método de pago.");
-      return;
-    }
+const handleContinue = async () => {
+  console.log("Datos enviados a crear-preferencia:", {
+    id_usuario,
+    id_habitacion,
+    fechainicio,
+    fechafin,
+    tipo_tarifa,
+    totalpagar,
+  });
 
-    if (!id_usuario || !id_habitacion || !id_hotel || !fechainicio || !fechafin || !tipo_tarifa || !totalpagar) {
-      setError("Datos de reserva incompletos. Por favor, regresa y completa la información.");
-      return;
-    }
+  if (!selectedMethod) {
+    setError("Por favor, selecciona un método de pago.");
+    return;
+  }
 
-    if (selectedMethod === methodProperties["Mercado Pago"].id) {
-      setLoading(true);
-      try {
-        const response = await axios.post(
-          "https://backendreservas-m2zp.onrender.com/api/mercadopago/crear-preferencia",
-          {
-            id_usuario,
-            id_habitacion,
-            id_hotel,
-            fechainicio,
-            fechafin,
-            tipo_tarifa,
-            totalpagar,
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
+  if (!id_usuario || !id_habitacion || !fechainicio || !fechafin || !tipo_tarifa || !totalpagar) {
+    setError("Datos de reserva incompletos. Por favor, regresa y completa la información.");
+    return;
+  }
 
-        const { init_point } = response.data;
-        window.location.href = init_point; // Redirige al cliente al enlace de pago de Mercado Pago
-      } catch (err) {
-        setError(err.response?.data?.error || "Error al generar el enlace de pago. Intenta de nuevo.");
-        console.error("Error al crear preferencia:", err);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Lógica para otros métodos de pago (Tarjeta de Débito, Tarjeta de Crédito)
-      setError("Método de pago no implementado aún. Selecciona Mercado Pago.");
+  if (selectedMethod === methodProperties["Mercado Pago"].id) {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://backendreservas-m2zp.onrender.com/api/mercadopago/crear-preferencia",
+        {
+          id_usuario,
+          id_habitacion,
+          fechainicio,
+          fechafin,
+          tipo_tarifa,
+          totalpagar,
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      const { init_point } = response.data;
+      window.location.href = init_point;
+    } catch (err) {
+      setError(err.response?.data?.error || "Error al generar el enlace de pago. Intenta de nuevo.");
+      console.error("Error al crear preferencia:", err);
+    } finally {
+      setLoading(false);
     }
-  };
+  } else {
+    setError("Método de pago no implementado aún. Selecciona Mercado Pago.");
+  }
+};
 
   if (loading) {
     return (
