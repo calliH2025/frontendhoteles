@@ -293,45 +293,39 @@ const DetallesHabitacion = () => {
     const endDate = new Date(fechafin);
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
       setTotalpagar(null);
-      setError(
-        "Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada."
-      );
+      setError("Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada.");
       return;
     }
 
-    const isSameDay = startDate.toDateString() === endDate.toDateString();
     const diffHours = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60)));
     const diffDays = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
     const diffWeeks = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7)));
 
+    let adjustedTarifa = tipo_tarifa;
     let validationError = "";
     switch (tipo_tarifa) {
       case "hora":
-        if (!isSameDay) {
-          validationError =
-            "Para la tarifa por hora, las fechas deben ser del mismo día. Ajustando a 'día'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "dia" }));
+        if (diffHours > 24) {
+          adjustedTarifa = "dia";
+          validationError = "Tarifa por hora ajustada a 'Por Día' debido a más de 24 horas.";
         }
         break;
       case "dia":
         if (diffHours < 24) {
-          validationError =
-            "Para la tarifa por día, se requiere al menos 24 horas. Ajustando a 'hora'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "hora" }));
+          adjustedTarifa = "hora";
+          validationError = "Tarifa por día ajustada a 'Por Hora' debido a menos de 24 horas.";
         }
         break;
       case "noche":
         if (diffDays < 1) {
-          validationError =
-            "Para la tarifa por noche, se requiere al menos un día. Ajustando a 'hora'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "hora" }));
+          adjustedTarifa = "hora";
+          validationError = "Tarifa por noche ajustada a 'Por Hora' debido a menos de 1 día.";
         }
         break;
       case "semana":
         if (diffDays < 7) {
-          validationError =
-            "Para la tarifa por semana, se requieren al menos 7 días. Ajustando a 'día'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "dia" }));
+          adjustedTarifa = "dia";
+          validationError = "Tarifa por semana ajustada a 'Por Día' debido a menos de 7 días.";
         }
         break;
       default:
@@ -339,8 +333,9 @@ const DetallesHabitacion = () => {
     }
 
     if (validationError) {
+      setReservation((prev) => ({ ...prev, tipo_tarifa: adjustedTarifa }));
       setError(validationError);
-      setTotalpagar(null);
+      validateAndCalculate({ ...newReservation, tipo_tarifa: adjustedTarifa }); // Recalcular con la tarifa ajustada
       return;
     }
 
@@ -351,7 +346,7 @@ const DetallesHabitacion = () => {
           id_habitacion: parseInt(idHabitacion),
           fechainicio: startDate.toISOString(),
           fechafin: endDate.toISOString(),
-          tipo_tarifa,
+          tipo_tarifa: adjustedTarifa,
         },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -361,10 +356,7 @@ const DetallesHabitacion = () => {
       setError("");
     } catch (err) {
       setTotalpagar(null);
-      const errorMessage =
-        err.response?.data?.error ||
-        err.message ||
-        "Error al calcular el total. Verifique las fechas o contacte al soporte.";
+      const errorMessage = err.response?.data?.error || "Error al calcular el total. Verifique las fechas o contacte al soporte.";
       setError(errorMessage);
       console.error("Error en calculateTotal:", err.response?.data || err);
     }
