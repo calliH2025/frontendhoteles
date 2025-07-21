@@ -435,7 +435,8 @@ const handleContinue = async () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      const { init_point } = response.data;
+      const { init_point, external_reference } = response.data;
+      localStorage.setItem("external_reference", external_reference); // Almacenar para uso en historial
       window.location.href = init_point;
     } catch (err) {
       setError(err.response?.data?.error || "Error al generar el enlace de pago. Intenta de nuevo.");
