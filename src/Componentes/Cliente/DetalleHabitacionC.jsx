@@ -282,85 +282,88 @@ const DetallesHabitacion = () => {
   };
 
   const validateAndCalculate = async (newReservation) => {
-    const { fechainicio, fechafin, tipo_tarifa } = newReservation;
-    if (!fechainicio || !fechafin || !tipo_tarifa) {
-      setTotalpagar(null);
-      setError("");
-      return;
-    }
+  const { fechainicio, fechafin, tipo_tarifa } = newReservation;
+  if (!fechainicio || !fechafin || !tipo_tarifa) {
+    setTotalpagar(null);
+    setError("");
+    return;
+  }
 
-    const startDate = new Date(fechainicio);
-    const endDate = new Date(fechafin);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
-      setTotalpagar(null);
-      setError("Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada.");
-      return;
-    }
+  const startDate = new Date(fechainicio);
+  const endDate = new Date(fechafin);
+  console.log(`Fechas enviadas - Inicio: ${startDate.toISOString()}, Fin: ${endDate.toISOString()}`);
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
+    setTotalpagar(null);
+    setError("Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada.");
+    return;
+  }
 
-    const diffHours = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60)));
-    const diffDays = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
-    const diffWeeks = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7)));
+  const diffHours = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60)));
+  const diffDays = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+  const diffWeeks = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7)));
+  console.log(`Diferencias - Horas: ${diffHours}, Días: ${diffDays}, Semanas: ${diffWeeks}`);
 
-    let adjustedTarifa = tipo_tarifa;
-    let validationError = "";
-    switch (tipo_tarifa) {
-      case "hora":
-        if (diffHours > 24) {
-          adjustedTarifa = "dia";
-          validationError = "Tarifa por hora ajustada a 'Por Día' debido a más de 24 horas.";
-        }
-        break;
-      case "dia":
-        if (diffHours < 24) {
-          adjustedTarifa = "hora";
-          validationError = "Tarifa por día ajustada a 'Por Hora' debido a menos de 24 horas.";
-        }
-        break;
-      case "noche":
-        if (diffDays < 1) {
-          adjustedTarifa = "hora";
-          validationError = "Tarifa por noche ajustada a 'Por Hora' debido a menos de 1 día.";
-        }
-        break;
-      case "semana":
-        if (diffDays < 7) {
-          adjustedTarifa = "dia";
-          validationError = "Tarifa por semana ajustada a 'Por Día' debido a menos de 7 días.";
-        }
-        break;
-      default:
-        validationError = "Seleccione un tipo de tarifa válido.";
-    }
+  let adjustedTarifa = tipo_tarifa;
+  let validationError = "";
+  switch (tipo_tarifa) {
+    case "hora":
+      if (diffHours > 24) {
+        adjustedTarifa = "dia";
+        validationError = "Tarifa por hora ajustada a 'Por Día' debido a más de 24 horas.";
+      }
+      break;
+    case "dia":
+      if (diffHours < 24) {
+        adjustedTarifa = "hora";
+        validationError = "Tarifa por día ajustada a 'Por Hora' debido a menos de 24 horas.";
+      }
+      break;
+    case "noche":
+      if (diffDays < 1) {
+        adjustedTarifa = "hora";
+        validationError = "Tarifa por noche ajustada a 'Por Hora' debido a menos de 1 día.";
+      }
+      break;
+    case "semana":
+      if (diffDays < 7) {
+        adjustedTarifa = "dia";
+        validationError = "Tarifa por semana ajustada a 'Por Día' debido a menos de 7 días.";
+      }
+      break;
+    default:
+      validationError = "Seleccione un tipo de tarifa válido.";
+  }
 
-    if (validationError) {
-      setReservation((prev) => ({ ...prev, tipo_tarifa: adjustedTarifa }));
-      setError(validationError);
-      validateAndCalculate({ ...newReservation, tipo_tarifa: adjustedTarifa }); // Recalcular con la tarifa ajustada
-      return;
-    }
+  if (validationError) {
+    setReservation((prev) => ({ ...prev, tipo_tarifa: adjustedTarifa }));
+    setError(validationError);
+    console.log(`Tarifa ajustada a: ${adjustedTarifa}`);
+    validateAndCalculate({ ...newReservation, tipo_tarifa: adjustedTarifa });
+    return;
+  }
 
-    try {
-      const response = await axios.post(
-        `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
-        {
-          id_habitacion: parseInt(idHabitacion),
-          fechainicio: startDate.toISOString(),
-          fechafin: endDate.toISOString(),
-          tipo_tarifa: adjustedTarifa,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      console.log('Respuesta de calculate-total:', response.data);
-      const { totalpagar, priceDetails } = response.data;
-      setTotalpagar(totalpagar);
-      setError("");
-    } catch (err) {
-      setTotalpagar(null);
-      const errorMessage = err.response?.data?.error || "Error al calcular el total. Verifique las fechas o contacte al soporte.";
-      setError(errorMessage);
-      console.error("Error en calculateTotal:", err.response?.data || err);
-    }
-  };
+  try {
+    const response = await axios.post(
+      `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
+      {
+        id_habitacion: parseInt(idHabitacion),
+        fechainicio: startDate.toISOString(),
+        fechafin: endDate.toISOString(),
+        tipo_tarifa: adjustedTarifa,
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    console.log('Respuesta de calculate-total:', response.data);
+    const { totalpagar, priceDetails } = response.data;
+    setTotalpagar(totalpagar);
+    setError("");
+  } catch (err) {
+    setTotalpagar(null);
+    const errorMessage = err.response?.data?.error || "Error al calcular el total. Verifique las fechas o contacte al soporte.";
+    setError(errorMessage);
+    console.error("Error en calculateTotal:", err.response?.data || err);
+  }
+};
 
   const handleReservation = () => {
     if (!id_usuario) {
