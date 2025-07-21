@@ -78,11 +78,13 @@ const GestionReservas = () => {
   };
 
   const formatDate = (dateString) => {
-    return moment.tz(dateString, "America/Mexico_City").format("DD MMMM");
+    // Parse the date string explicitly as UTC if it comes from the server
+    return moment.utc(dateString).tz("America/Mexico_City").format("DD MMMM");
   };
 
   const formatDateTime = (dateString) => {
-    return moment.tz(dateString, "America/Mexico_City").format("DD/MM/YYYY HH:mm");
+    // Parse the date string explicitly as UTC if it comes from the server
+    return moment.utc(dateString).tz("America/Mexico_City").format("DD/MM/YYYY HH:mm");
   };
 
   const modalStyle = {
@@ -216,7 +218,7 @@ const GestionReservas = () => {
           <Fade in={isModalOpen}>
             <Box sx={modalStyle}>
               <Typography variant="h6" sx={{ color: "#2e7d32", mb: 2, textAlign: "center" }}>
-                Reservas Confirmadas para {selectedDate ? moment.tz(selectedDate, "America/Mexico_City").format("DD MMMM YYYY") : ""}
+                Reservas Confirmadas para {selectedDate ? moment.utc(selectedDate).tz("America/Mexico_City").format("DD MMMM YYYY") : ""}
               </Typography>
               {isLoading ? (
                 <Box sx={{ textAlign: "center", py: 2 }}>
