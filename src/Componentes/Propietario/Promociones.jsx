@@ -382,8 +382,8 @@ const Promociones = () => {
                 <TableRow key={promocion.id_promocion} sx={{ '&:hover': { backgroundColor: '#b3c9ca20' } }}>
                   <TableCell sx={{ color: '#0b7583', fontWeight: '600' }}>{promocion.descripcion}</TableCell>
                   <TableCell sx={{ color: '#549c94', fontWeight: '500' }}>{promocion.descuento}%</TableCell>
-                  <TableCell sx={{ color: '#549c94', fontWeight: '500' }}>{promocion.fechainicio}</TableCell>
-                  <TableCell sx={{ color: '#4c94bc', fontWeight: '500' }}>{promocion.fechafin}</TableCell>
+                  <TableCell sx={{ color: '#549c94', fontWeight: '500' }}>{promocion.fechainicio ? promocion.fechainicio.slice(0, 10) : ''}</TableCell>
+                  <TableCell sx={{ color: '#4c94bc', fontWeight: '500' }}>{promocion.fechafin ? promocion.fechafin.slice(0, 10) : ''}</TableCell>
                   <TableCell sx={{ color: '#4c94bc', fontWeight: '500' }}>{promocion.nombrehotel}</TableCell>
                   <TableCell sx={{ color: promocion.estado === 'Activo' ? '#4caf50' : '#f44336', fontWeight: '500' }}>
                     {promocion.estado}
