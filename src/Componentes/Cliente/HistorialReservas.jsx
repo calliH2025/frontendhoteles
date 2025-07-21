@@ -194,9 +194,10 @@ export default function MisReservas() {
   }
   const fechaMoment = momentTz(fecha, 'YYYY-MM-DD HH:mm:ss').tz('America/Mexico_City');
   if (!fechaMoment.isValid()) {
-    console.warn('Fecha inválida:', fecha);
+    console.warn('Fecha inválida recibida:', fecha);
     return 'Fecha inválida';
   }
+  console.log('Fecha procesada:', fecha, '->', fechaMoment.format('YYYY-MM-DD HH:mm:ss'));
   return fechaMoment.format('D [de] MMMM [de] YYYY, h:mm a');
 };
 
