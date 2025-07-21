@@ -78,12 +78,12 @@ const GestionReservas = () => {
   };
 
   const formatDate = (dateString) => {
-    // Parse the date string explicitly as UTC if it comes from the server
-    return moment.utc(dateString).tz("America/Mexico_City").format("DD MMMM");
+    // Parse the date string explicitly as UTC and convert to CST
+    return moment.utc(dateString, "YYYY-MM-DD").tz("America/Mexico_City").format("DD MMMM");
   };
 
   const formatDateTime = (dateString) => {
-    // Parse the date string explicitly as UTC if it comes from the server
+    // Parse the date string explicitly as UTC and convert to CST
     return moment.utc(dateString).tz("America/Mexico_City").format("DD/MM/YYYY HH:mm");
   };
 
@@ -251,7 +251,7 @@ const GestionReservas = () => {
                           <TableCell>{`${res.nombre_cliente} ${res.apellido_paterno}`}</TableCell>
                           <TableCell>{res.cuarto}</TableCell>
                           <TableCell>{formatDateTime(res.fechainicio)}</TableCell>
-                          <TableCell>{formatDateTime(res.fechafin)}</TableCell>
+                          <TableCell>{formatDateTime(res.fechainicio)}</TableCell>
                           <TableCell>${res.totalpagar}</TableCell>
                           <TableCell>{res.nombrehotel}</TableCell>
                         </TableRow>
