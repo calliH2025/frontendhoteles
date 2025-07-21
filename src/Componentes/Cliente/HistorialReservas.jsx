@@ -105,32 +105,58 @@ export default function MisReservas() {
   }, [id_usuario]);
 
   const fetchUserReservations = async () => {
-    try {
-      setIsLoadingReservations(true);
-      if (!id_usuario) return;
+  try {
+    setIsLoadingReservations(true);
+    if (!id_usuario) return;
 
-      const [confirmedResponse, expiredResponse] = await Promise.all([
-        axios.get(`https://backendreservas-m2zp.onrender.com/api/reservas/usuario/${id_usuario}/confirmed`),
-        axios.get(`https://backendreservas-m2zp.onrender.com/api/reservas/usuario/${id_usuario}/expired`),
-      ]);
+    const [confirmedResponse, expiredResponse] = await Promise.all([
+      axios.get(`https://backendreservas-m2zp.onrender.com/api/reservas/usuario/${id_usuario}/confirmed`),
+      axios.get(`https://backendreservas-m2zp.onrender.com/api/reservas/usuario/${id_usuario}/expired`),
+    ]);
 
-      console.log("Reservas Confirmadas Crudas:", confirmedResponse.data);
-      console.log("Reservas Vencidas Crudas:", expiredResponse.data);
+    console.log("Reservas Confirmadas Crudas:", confirmedResponse.data);
+    console.log("Reservas Vencidas Crudas:", expiredResponse.data);
 
-      const cancelledReservations = JSON.parse(localStorage.getItem("cancelledReservations") || "[]");
-      const filteredConfirmed = confirmedResponse.data.filter((res) => !cancelledReservations.includes(res.id_reserva));
-      const filteredExpired = expiredResponse.data.filter((res) => !cancelledReservations.includes(res.id_reserva));
+    // Validar y formatear fechas en las reservas confirmadas
+    const formattedConfirmed = confirmedResponse.data.map(reserva => ({
+      ...reserva,
+      fechainicio: momentTz(reserva.fechainicio, 'YYYY-MM-DD HH:mm:ss').isValid()
+        ? momentTz(reserva.fechainicio, 'YYYY-MM-DD HH:mm:ss').tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss')
+        : null,
+      fechafin: momentTz(reserva.fechafin, 'YYYY-MM-DD HH:mm:ss').isValid()
+        ? momentTz(reserva.fechafin, 'YYYY-MM-DD HH:mm:ss').tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss')
+        : null,
+    }));
 
-      setConfirmedReservations(filteredConfirmed);
-      setExpiredReservations(filteredExpired);
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.error || "Error al cargar las reservas del usuario.");
-      console.error("Error al obtener reservas:", err.response?.data || err.message);
-    } finally {
-      setIsLoadingReservations(false);
-    }
-  };
+    // Validar y formatear fechas en las reservas vencidas
+    const formattedExpired = expiredResponse.data.map(reserva => ({
+      ...reserva,
+      fechainicio: momentTz(reserva.fechainicio, 'YYYY-MM-DD HH:mm:ss').isValid()
+        ? momentTz(reserva.fechainicio, 'YYYY-MM-DD HH:mm:ss').tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss')
+        : null,
+      fechafin: momentTz(reserva.fechafin, 'YYYY-MM-DD HH:mm:ss').isValid()
+        ? momentTz(reserva.fechafin, 'YYYY-MM-DD HH:mm:ss').tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss')
+        : null,
+    }));
+
+    const cancelledReservations = JSON.parse(localStorage.getItem("cancelledReservations") || "[]");
+    const filteredConfirmed = formattedConfirmed.filter(
+      (res) => !cancelledReservations.includes(res.id_reserva) && res.fechainicio && res.fechafin
+    );
+    const filteredExpired = formattedExpired.filter(
+      (res) => !cancelledReservations.includes(res.id_reserva) && res.fechainicio && res.fechafin
+    );
+
+    setConfirmedReservations(filteredConfirmed);
+    setExpiredReservations(filteredExpired);
+    setError(null);
+  } catch (err) {
+    setError(err.response?.data?.error || "Error al cargar las reservas del usuario.");
+    console.error("Error al obtener reservas:", err.response?.data || err.message);
+  } finally {
+    setIsLoadingReservations(false);
+  }
+};
 
   const handleCancelReservation = async (id_reserva) => {
     const result = await Swal.fire({
@@ -162,10 +188,17 @@ export default function MisReservas() {
   };
 
   const formatearFecha = (fecha) => {
-    return momentTz(fecha)
-      .tz('America/Mexico_City')
-      .format('D [de] MMMM [de] YYYY, h:mm a');
-  };
+  if (!fecha) {
+    console.warn('Fecha recibida es nula o indefinida:', fecha);
+    return 'Fecha no disponible';
+  }
+  const fechaMoment = momentTz(fecha, 'YYYY-MM-DD HH:mm:ss').tz('America/Mexico_City');
+  if (!fechaMoment.isValid()) {
+    console.warn('Fecha inválida:', fecha);
+    return 'Fecha inválida';
+  }
+  return fechaMoment.format('D [de] MMMM [de] YYYY, h:mm a');
+};
 
   const TablaReservas = ({ reservas, mostrarAcciones = false }) => (
     <TableContainer component={Paper} elevation={2}>
