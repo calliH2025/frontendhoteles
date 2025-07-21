@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import momentTz from 'moment-timezone';
 import {
   Box,
   Typography,
@@ -289,18 +290,26 @@ const DetallesHabitacion = () => {
     return;
   }
 
-  const startDate = new Date(fechainicio);
-  const endDate = new Date(fechafin);
-  console.log(`Fechas enviadas - Inicio: ${startDate.toISOString()}, Fin: ${endDate.toISOString()}`);
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
+  // Convertir fechas a CST usando moment-timezone
+  const startDateCST = momentTz(fechainicio).tz('America/Mexico_City');
+  const endDateCST = momentTz(fechafin).tz('America/Mexico_City');
+
+  // Validar fechas
+  if (!startDateCST.isValid() || !endDateCST.isValid() || startDateCST >= endDateCST) {
     setTotalpagar(null);
     setError("Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada.");
     return;
   }
 
-  const diffHours = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60)));
-  const diffDays = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
-  const diffWeeks = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7)));
+  // Formatear fechas en CST para logs y envío
+  const fechainicioCST = startDateCST.format('YYYY-MM-DD HH:mm:ss');
+  const fechafinCST = endDateCST.format('YYYY-MM-DD HH:mm:ss');
+  console.log(`Fechas en CST - Inicio: ${fechainicioCST}, Fin: ${fechafinCST}`);
+
+  // Calcular diferencias en CST
+  const diffHours = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'hours')));
+  const diffDays = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'days')));
+  const diffWeeks = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'weeks')));
   console.log(`Diferencias - Horas: ${diffHours}, Días: ${diffDays}, Semanas: ${diffWeeks}`);
 
   let adjustedTarifa = tipo_tarifa;
@@ -347,8 +356,8 @@ const DetallesHabitacion = () => {
       `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
       {
         id_habitacion: parseInt(idHabitacion),
-        fechainicio: startDate.toISOString(),
-        fechafin: endDate.toISOString(),
+        fechainicio: fechainicioCST,
+        fechafin: fechafinCST,
         tipo_tarifa: adjustedTarifa,
       },
       { headers: { "Content-Type": "application/json" } }
@@ -366,41 +375,48 @@ const DetallesHabitacion = () => {
 };
 
   const handleReservation = () => {
-    if (!id_usuario) {
-      setError("No se pudo obtener el ID del usuario. Por favor, inicia sesión de nuevo.");
-      return;
-    }
+  if (!id_usuario) {
+    setError("No se pudo obtener el ID del usuario. Por favor, inicia sesión de nuevo.");
+    return;
+  }
 
-    const { fechainicio, fechafin, tipo_tarifa } = reservation;
-    if (!fechainicio || !fechafin || !tipo_tarifa || !totalpagar) {
-      setError("Por favor, complete todos los campos de reserva y calcule el total.");
-      return;
-    }
+  const { fechainicio, fechafin, tipo_tarifa } = reservation;
+  if (!fechainicio || !fechafin || !tipo_tarifa || !totalpagar) {
+    setError("Por favor, complete todos los campos de reserva y calcule el total.");
+    return;
+  }
 
-    if (habitacion.estado?.toLowerCase() !== "disponible") {
-      setError("Esta habitación no está disponible para reservar.");
-      return;
-    }
+  if (habitacion.estado?.toLowerCase() !== "disponible") {
+    setError("Esta habitación no está disponible para reservar.");
+    return;
+  }
 
-    const startDate = new Date(fechainicio);
-    const endDate = new Date(fechafin);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
-      setError("Las fechas seleccionadas no son válidas.");
-      return;
-    }
+  // Convertir fechas a CST
+  const startDateCST = momentTz(fechainicio).tz('America/Mexico_City');
+  const endDateCST = momentTz(fechafin).tz('America/Mexico_City');
 
-    // Navegar a la página de catálogo de pagos con los datos de la reserva
-    navigate("/cliente/catalopagos", {
-      state: {
-        id_usuario,
-        id_habitacion: parseInt(idHabitacion),
-        fechainicio: startDate.toISOString(),
-        fechafin: endDate.toISOString(),
-        tipo_tarifa,
-        totalpagar,
-      },
-    });
-  };
+  // Validar fechas
+  if (!startDateCST.isValid() || !endDateCST.isValid() || startDateCST >= endDateCST) {
+    setError("Las fechas seleccionadas no son válidas.");
+    return;
+  }
+
+  // Formatear fechas en CST
+  const fechainicioCST = startDateCST.format('YYYY-MM-DD HH:mm:ss');
+  const fechafinCST = endDateCST.format('YYYY-MM-DD HH:mm:ss');
+
+  // Navegar a la página de catálogo de pagos con los datos de la reserva
+  navigate("/cliente/catalopagos", {
+    state: {
+      id_usuario,
+      id_habitacion: parseInt(idHabitacion),
+      fechainicio: fechainicioCST,
+      fechafin: fechafinCST,
+      tipo_tarifa,
+      totalpagar,
+    },
+  });
+};
 
   const getServiceIcons = (servicios) => {
     const serviceMap = {
