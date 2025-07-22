@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import momentTz from 'moment-timezone';
 import {
   Box,
   Typography,
@@ -39,9 +40,11 @@ import {
   Pool,
   Spa,
 } from "@mui/icons-material";
+import Swal from 'sweetalert2';
 
 const DetallesHabitacion = () => {
   const { idHabitacion } = useParams();
+  const navigate = useNavigate();
   const [habitacion, setHabitacion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,7 +54,6 @@ const DetallesHabitacion = () => {
     tipo_tarifa: "",
   });
   const [totalpagar, setTotalpagar] = useState(null);
-  const [reservationSuccess, setReservationSuccess] = useState("");
 
   const colors = {
     primary: "#4c94bc",
@@ -208,7 +210,7 @@ const DetallesHabitacion = () => {
       const response = await axios.get(
         `https://backendreservas-m2zp.onrender.com/api/detallesHabitacion/detalles/${idHabitacion}`
       );
-      console.log('Datos de habitación:', response.data);
+      console.log('Datos de habitación recibidos:', response.data);
       setHabitacion(response.data);
       setError("");
     } catch (err) {
@@ -216,7 +218,7 @@ const DetallesHabitacion = () => {
         err.response?.status === 404
           ? "Habitación no encontrada en la base de datos."
           : err.response?.data?.error ||
-            "Error al cargar los detalles de la habitación. Intente de nuevo.";
+          "Error al cargar los detalles de la habitación. Intente de nuevo.";
       setError(errorMessage);
       console.error("Error al obtener habitación:", err.response?.data || err.message);
     } finally {
@@ -235,166 +237,83 @@ const DetallesHabitacion = () => {
     });
   };
 
-  const validateAndCalculate = async (newParentReservation) => {
-    const { fechainicio, fechafin, tipo_tarifa } = newParentReservation;
+  const validateAndCalculate = async (newReservation) => {
+    const { fechainicio, fechafin, tipo_tarifa } = newReservation;
     if (!fechainicio || !fechafin || !tipo_tarifa) {
       setTotalpagar(null);
       setError("");
       return;
     }
 
-    const startDate = new Date(fechainicio);
-    const endDate = new Date(fechafin);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate >= endDate) {
+    const startDateCST = momentTz(fechainicio).tz('America/Mexico_City');
+    const endDateCST = momentTz(fechafin).tz('America/Mexico_City');
+
+    if (!startDateCST.isValid() || !endDateCST.isValid() || startDateCST >= endDateCST) {
       setTotalpagar(null);
-      setError(
-        "Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada."
-      );
+      setError("Las fechas seleccionadas no son válidas. Asegúrese de que la fecha de salida sea posterior a la de llegada.");
       return;
     }
 
-    const isSameDay = startDate.toDateString() === endDate.toDateString();
-    const diffHours = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60)));
-    const diffDays = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
-    const diffWeeks = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7)));
-
-    let validationError = "";
+    // Calcular duración
+    let duration = 1;
     switch (tipo_tarifa) {
       case "hora":
-        if (!isSameDay) {
-          validationError =
-            "Para la tarifa por hora, las fechas deben ser del mismo día. Ajustando a 'día'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "dia" }));
-        }
+        duration = Math.max(1, endDateCST.diff(startDateCST, 'hours'));
         break;
       case "dia":
-        if (diffHours < 24) {
-          validationError =
-            "Para la tarifa por día, se requiere al menos 24 horas. Ajustando a 'hora'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "hora" }));
-        }
+        duration = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'hours') / 24));
         break;
       case "noche":
-        if (diffDays < 1) {
-          validationError =
-            "Para la tarifa por noche, se requiere al menos un día. Ajustando a 'hora'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "hora" }));
-        }
+        duration = Math.max(1, Math.max(0, endDateCST.diff(startDateCST, 'days') - 1));
         break;
       case "semana":
-        if (diffDays < 7) {
-          validationError =
-            "Para la tarifa por semana, se requieren al menos 7 días. Ajustando a 'día'...";
-          setReservation((prev) => ({ ...prev, tipo_tarifa: "dia" }));
-        }
+        duration = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'days') / 7));
         break;
       default:
-        validationError = "Seleccione un tipo de tarifa válido.";
+        duration = 1;
     }
 
-    if (validationError) {
-      setError(validationError);
+    // Obtener precio base
+    let basePrice = 0;
+    switch (tipo_tarifa) {
+      case "hora":
+        basePrice = habitacion?.preciohora;
+        break;
+      case "dia":
+        basePrice = habitacion?.preciodia;
+        break;
+      case "noche":
+        basePrice = habitacion?.precionoche;
+        break;
+      case "semana":
+        basePrice = habitacion?.preciosemana;
+        break;
+      default:
+        basePrice = 0;
+    }
+    // Calcular precio con o sin promoción
+    const price = getDiscountedPrice(basePrice);
+    if (price === "No definido") {
       setTotalpagar(null);
+      setError("No hay precio definido para la tarifa seleccionada.");
       return;
     }
-
-    try {
-      const response = await axios.post(
-        `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
-        {
-          id_habitacion: parseInt(idHabitacion),
-          fechainicio: startDate.toISOString(),
-          fechafin: endDate.toISOString(),
-          tipo_tarifa,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      const { totalpagar, priceDetails } = response.data;
-
-      const priceMap = {
-        hora: Number(habitacion?.preciohora) || null,
-        dia: Number(habitacion?.preciodia) || null,
-        noche: Number(habitacion?.precionoche) || null,
-        semana: Number(habitacion?.preciosemana) || null,
-      };
-
-      const basePrice = priceMap[tipo_tarifa];
-      const expectedPrice = hasActivePromotion && habitacion.promocion?.descuento
-        ? basePrice * (1 - habitacion.promocion.descuento / 100)
-        : basePrice;
-
-      const duration = tipo_tarifa === 'hora' ? diffHours :
-                       tipo_tarifa === 'semana' ? diffWeeks : diffDays;
-      
-      const expectedTotal = expectedPrice && !isNaN(expectedPrice)
-        ? Number((expectedPrice * duration).toFixed(2))
-        : null;
-
-      if (expectedTotal && Math.abs(totalpagar - expectedTotal) > 0.01) {
-        console.warn(
-          `Discrepancia en el total: Servidor $${totalpagar}, Esperado $${expectedTotal}, ` +
-          `Precio Unitario: $${priceDetails.precio_unitario}, Descuento Aplicado: ${priceDetails.descuento_aplicado}%`
-        );
-        setError("El total calculado no coincide con el precio esperado. Por favor, contacte al soporte.");
-        setTotalpagar(null);
-        return;
-      }
-
-      setTotalpagar(totalpagar);
-      setError("");
-      console.log('Cálculo exitoso:', priceDetails);
-    } catch (err) {
-      setTotalpagar(null);
-      const errorMessage =
-        err.response?.data?.error ||
-        err.message ||
-        "Error al calcular el total. Verifique las fechas o contacte al soporte.";
-      setError(errorMessage);
-      console.error("Error en calculateTotal:", err.response?.data || err);
-    }
+    setTotalpagar(Number(price) * duration);
+    setError("");
   };
 
-  const handleReservation = async () => {
-    const { fechainicio, fechafin, tipo_tarifa } = reservation;
-    if (!fechainicio || !fechafin || !tipo_tarifa || !totalpagar) {
-      setError("Por favor, complete todos los campos de reserva y calcule el total.");
-      return;
-    }
-
-    if (habitacion.estado?.toLowerCase() !== "disponible") {
-      setError("Esta habitación no está disponible para reservar.");
-      return;
-    }
-
-    const startDate = new Date(fechainicio);
-    const endDate = new Date(fechafin);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.stTime()) || startDate >= endDate) {
-      setError("Las fechas seleccionadas no son válidas.");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `https://backendreservas-m2zp.onrender.com/api/reservas`,
-        {
-          id_habitacion: parseInt(idHabitacion),
-          fechainicio: startDate.toISOString(),
-          fechafin: endDate.toISOString(),
-          tipo_tarifa,
-          totalpagar,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      setReservationSuccess(`¡Reserva creada con éxito! Total: $${response.data.totalpagar}`);
-      setError("");
-      setReservation({ fechainicio: "", fechafin: "", tipo_tarifa: "" });
-      setTotalpagar(null);
-      fetchHabitacion();
-    } catch (err) {
-      setError(err.response?.data?.error || "Error al realizar la reserva. Verifique los datos.");
-      console.error("Error al reservar:", err.response?.data || err);
-    }
+  const handleReservation = () => {
+    Swal.fire({
+      icon: 'info',
+      title: 'Inicia sesión o regístrate',
+      text: 'Para hacer la reserva primero debes registrarte o iniciar sesión si ya tienes una cuenta.',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#1976d2',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/login';
+      }
+    });
   };
 
   const getServiceIcons = (servicios) => {
@@ -454,11 +373,15 @@ const DetallesHabitacion = () => {
     );
   };
 
-  const currentDate = new Date();
+  // Lógica de promoción activa usando moment-timezone y solo la fecha
+  const nowCST = momentTz().tz('America/Mexico_City');
+  const promoStart = habitacion?.promocion?.fechainicio ? momentTz(habitacion.promocion.fechainicio, 'YYYY-MM-DD').tz('America/Mexico_City') : null;
+  const promoEnd = habitacion?.promocion?.fechafin ? momentTz(habitacion.promocion.fechafin, 'YYYY-MM-DD').tz('America/Mexico_City') : null;
   const hasActivePromotion =
-    habitacion?.promocion &&
-    new Date(habitacion.promocion.fechainicio) <= currentDate &&
-    new Date(habitacion.promocion.fechafin) >= currentDate;
+    habitacion?.promocion?.descuento &&
+    promoStart && promoEnd &&
+    nowCST.isSameOrAfter(promoStart, 'day') &&
+    nowCST.isSameOrBefore(promoEnd, 'day');
 
   const getDiscountedPrice = (originalPrice) => {
     const price = Number(originalPrice);
@@ -516,7 +439,7 @@ const DetallesHabitacion = () => {
   if (!habitacion) {
     return (
       <Box sx={styles.container}>
-        <Container maxWidth="lg" sx={{ py: 4, textAlign: "center" }}>
+        <Container maxWidth="xl"> {/* Cambiar de 'lg' a 'xl' o false */}
           <Typography
             variant="h4"
             sx={{ color: colors.primary, fontWeight: "600" }}
@@ -530,13 +453,13 @@ const DetallesHabitacion = () => {
 
   const images =
     habitacion.imagenes &&
-    Array.isArray(habitacion.imagenes) &&
-    habitacion.imagenes.length > 0
+      Array.isArray(habitacion.imagenes) &&
+      habitacion.imagenes.length > 0
       ? habitacion.imagenes
-          .map((img) =>
-            img.data && img.mimeType ? `data:${img.mimeType};base64,${img.data}` : null
-          )
-          .filter((img) => img)
+        .map((img) =>
+          img.data && img.mimeType ? `data:${img.mimeType};base64,${img.data}` : null
+        )
+        .filter((img) => img)
       : null;
   const normalizedEstado =
     habitacion.estado?.charAt(0).toUpperCase() +
@@ -579,20 +502,6 @@ const DetallesHabitacion = () => {
           </Card>
         </Fade>
 
-        {reservationSuccess && (
-          <Zoom in={true}>
-            <Box sx={{ mb: 3 }}>
-              <Alert
-                severity="success"
-                onClose={() => setReservationSuccess("")}
-                sx={{ borderRadius: "12px", fontSize: "1.1rem" }}
-              >
-                {reservationSuccess}
-              </Alert>
-            </Box>
-          </Zoom>
-        )}
-
         <Fade in={true} timeout={1000}>
           <Box sx={{ mb: 4 }}>
             <Typography
@@ -609,7 +518,7 @@ const DetallesHabitacion = () => {
                     <Card sx={styles.imageCard}>
                       <CardMedia
                         component="img"
-                        height="200"
+                        height="250"
                         image={image}
                         alt={`Imagen ${index + 1} de ${habitacion.cuarto}`}
                         sx={{ objectFit: "cover" }}
@@ -645,189 +554,208 @@ const DetallesHabitacion = () => {
         </Fade>
 
         <Grid container spacing={4}>
-          <Grid item xs={12} lg={8}>
-            <Fade in={true} timeout={1200}>
-              <Card sx={styles.detailsCard}>
-                <CardContent sx={{ p: 4 }}>
-                  <Typography variant="h5" sx={styles.sectionTitle}>
-                    <RoomService sx={{ mr: 1, fontSize: "1.5rem" }} />
-                    Detalles de la Habitación
-                  </Typography>
+          {/* Sección Principal - Izquierda */}
+          <Grid item xs={12} lg={9}> 
+            <Grid container spacing={3}>
+              {/* Detalles de la Habitación */}
+               <Grid item xs={12} lg={7}>
+                <Fade in={true} timeout={1200}>
+                  <Card sx={styles.detailsCard}>
+                    <CardContent sx={{ p: 3 }}>
+                      <Typography variant="h5" sx={styles.sectionTitle}>
+                        <RoomService sx={{ mr: 1, fontSize: "1.5rem" }} />
+                        Detalles de la Habitación
+                      </Typography>
 
-                  <Grid container spacing={3} sx={{ mb: 4 }}>
-                    <Grid item xs={12} md={6}>
-                      <Box sx={styles.iconBox}>
-                        <AccessTime sx={styles.serviceIcon} />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography
-                            variant="subtitle1"
-                            sx={{ fontWeight: "600", color: colors.accent, mb: 0.5 }}
-                          >
-                            Horario
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: "#6c757d", lineHeight: 1.4 }}>
-                            {habitacion.horario
-                              ? new Date(habitacion.horario).toLocaleString()
-                              : "No definido"}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Box sx={styles.iconBox}>
-                        <Schedule sx={styles.serviceIcon} />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography
-                            variant="subtitle1"
-                            sx={{ fontWeight: "600", color: colors.accent, mb: 0.5 }}
-                          >
-                            Estado
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: isAvailable ? colors.success : "#dc3545",
-                              fontWeight: "600",
-                              lineHeight: 1.4,
-                            }}
-                          >
-                            {normalizedEstado || "Sin estado"}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <Box sx={styles.iconBox}>
-                        <Hotel sx={styles.serviceIcon} />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography
-                            variant="subtitle1"
-                            sx={{ fontWeight: "600", color: colors.accent, mb: 0.5 }}
-                          >
-                            Tipo de Habitación
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: "#6c757d", lineHeight: 1.4 }}>
-                            {habitacion.tipo_habitacion || "No definido"}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                  </Grid>
-
-                  <Divider sx={{ my: 4, borderColor: colors.neutral }} />
-
-                  <Typography variant="h6" sx={styles.sectionTitle}>
-                    <Spa sx={styles.serviceIcon} />
-                    Servicios del Hotel
-                  </Typography>
-                  <Grid container spacing={3}>
-                    {getServiceIcons(habitacion.servicios)}
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Fade>
-          </Grid>
-
-          <Grid item xs={12} lg={4}>
-            <Fade in={true} timeout={1400}>
-              <Box sx={{ position: "sticky", top: "2rem" }}>
-                <Paper sx={styles.priceCard}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: "600",
-                      mb: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      color: "white",
-                    }}
-                  >
-                    <AttachMoney sx={{ mr: 1, fontSize: "1.3rem" }} />
-                    Tarifas
-                  </Typography>
-
-                  {[
-                    {
-                      label: "Por Hora",
-                      price: habitacion?.preciohora,
-                    },
-                    {
-                      label: "Por Día",
-                      price: habitacion?.preciodia,
-                    },
-                    {
-                      label: "Por Noche",
-                      price: habitacion?.precionoche,
-                    },
-                    {
-                      label: "Por Semana",
-                      price: habitacion?.preciosemana,
-                    },
-                  ].map((item, index) => {
-                    console.log(`Tarifa ${item.label}:`, {
-                      price: item.price,
-                      type: typeof item.price,
-                    });
-                    const priceNum = Number(item.price);
-                    const originalPrice = isNaN(priceNum) || !isFinite(priceNum)
-                      ? "No definido"
-                      : priceNum.toFixed(2);
-                    const discountPrice = getDiscountedPrice(item.price);
-
-                    return (
-                      <Box key={index} sx={styles.priceRow}>
-                        <Typography
-                          variant="body1"
-                          sx={{ fontWeight: "600", color: "rgba(255,255,255,0.9)" }}
-                        >
-                          {item.label}:
-                        </Typography>
-                        <Box sx={{ textAlign: "right" }}>
-                          {hasActivePromotion && discountPrice !== originalPrice && originalPrice !== "No definido" ? (
-                            <>
-                              <Typography component="span" sx={styles.originalPrice}>
-                                ${originalPrice}
+                      <Grid container spacing={2} sx={{ mb: 3 }}>
+                        <Grid item xs={12}>
+                          <Box sx={styles.iconBox}>
+                            <AccessTime sx={styles.serviceIcon} />
+                            <Box sx={{ flex: 1 }}>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{ fontWeight: "600", color: colors.accent, mb: 0.5 }}
+                              >
+                                Horario
                               </Typography>
-                              <Typography component="span" sx={styles.discountedPrice}>
-                                ${discountPrice}
+                              <Typography variant="body2" sx={{ color: "#6c757d", lineHeight: 1.4 }}>
+                                {habitacion.horario
+                                  ? new Date(habitacion.horario).toLocaleString()
+                                  : "No definido"}
                               </Typography>
-                            </>
-                          ) : (
-                            <Typography
-                              variant="body1"
-                              sx={{ fontWeight: "700", color: "white", fontSize: "1.1rem" }}
-                            >
-                              ${originalPrice}
-                            </Typography>
-                          )}
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                  {hasActivePromotion && habitacion.promocion && (
-                    <Box
+                            </Box>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <Box sx={styles.iconBox}>
+                            <Schedule sx={styles.serviceIcon} />
+                            <Box sx={{ flex: 1 }}>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{ fontWeight: "600", color: colors.accent, mb: 0.5 }}
+                              >
+                                Estado
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: isAvailable ? colors.success : "#dc3545",
+                                  fontWeight: "600",
+                                  lineHeight: 1.4,
+                                }}
+                              >
+                                {normalizedEstado || "Sin estado"}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <Box sx={styles.iconBox}>
+                            <Hotel sx={styles.serviceIcon} />
+                            <Box sx={{ flex: 1 }}>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{ fontWeight: "600", color: colors.accent, mb: 0.5 }}
+                              >
+                                Tipo de Habitación
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: "#6c757d", lineHeight: 1.4 }}>
+                                {habitacion.tipo_habitacion || "No definido"}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Grid>
+                      </Grid>
+
+                      <Divider sx={{ my: 3, borderColor: colors.neutral }} />
+
+                      <Typography variant="h6" sx={styles.sectionTitle}>
+                        <Spa sx={{ mr: 1, fontSize: "1.3rem" }} />
+                        Servicios del Hotel
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {getServiceIcons(habitacion.servicios)}
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Fade>
+              </Grid>
+
+              {/* Tarifas */}
+              {/* Tarifas - Más ancho */}
+              <Grid item xs={12} md={8}>
+                <Fade in={true} timeout={1300}>
+                  <Paper sx={{ ...styles.priceCard, p: 3.5, height: 'fit-content' }}>
+                    <Typography
+                      variant="h6"
                       sx={{
-                        mt: 3,
-                        p: 2,
-                        backgroundColor: "rgba(255,235,59,0.2)",
-                        borderRadius: "8px",
-                        border: "1px solid rgba(255,235,59,0.3)",
+                        fontWeight: "600",
+                        mb: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        color: "white",
+                        fontSize: "1.2rem"
                       }}
                     >
-                      <Typography variant="body2" sx={{ color: "#ffeb3b", fontWeight: "600" }}>
-                        🎉 Promoción activa: {habitacion.promocion.descuento}% de descuento
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)" }}>
-                        Válida del {new Date(habitacion.promocion.fechainicio).toLocaleDateString()} al{" "}
-                        {new Date(habitacion.promocion.fechafin).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  )}
-                </Paper>
+                      <AttachMoney sx={{ mr: 1, fontSize: "1.4rem" }} />
+                      Tarifas
+                    </Typography>
 
-                <Card sx={styles.reservationCard}>
+                    {[
+                      {
+                        label: "Por Hora",
+                        price: habitacion?.preciohora,
+                      },
+                      {
+                        label: "Por Día",
+                        price: habitacion?.preciodia,
+                      },
+                      {
+                        label: "Por Noche",
+                        price: habitacion?.precionoche,
+                      },
+                      {
+                        label: "Por Semana",
+                        price: habitacion?.preciosemana,
+                      },
+                    ].map((item, index) => {
+                      console.log(`Tarifa ${item.label}:`, {
+                        price: item.price,
+                        type: typeof item.price,
+                      });
+                      const priceNum = Number(item.price);
+                      const originalPrice = isNaN(priceNum) || !isFinite(priceNum)
+                        ? "No definido"
+                        : priceNum.toFixed(2);
+                      const discountPrice = getDiscountedPrice(item.price);
+
+                      return (
+                        <Box key={index} sx={{
+                          ...styles.priceRow,
+                          mb: 1.5,
+                          py: 1
+                        }}>
+                          <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "600", color: "rgba(255,255,255,0.9)" }}
+                          >
+                            {item.label}:
+                          </Typography>
+                          <Box sx={{ textAlign: "right" }}>
+                            {hasActivePromotion && discountPrice !== originalPrice && originalPrice !== "No definido" ? (
+                              <>
+                                <Typography component="span" sx={styles.originalPrice}>
+                                  ${originalPrice}
+                                </Typography>
+                                <Typography component="span" sx={styles.discountedPrice}>
+                                  ${discountPrice}
+                                </Typography>
+                              </>
+                            ) : (
+                              <Typography
+                                variant="body1"
+                                sx={{ fontWeight: "700", color: "white", fontSize: "1.1rem" }}
+                              >
+                                ${originalPrice}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                    
+                    {hasActivePromotion && habitacion.promocion && (
+                      <Box
+                        sx={{
+                          mt: 2.5,
+                          p: 2,
+                          background: styles.priceCard.background, // Usa el mismo fondo que la sección de tarifas
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          borderLeft: '4px solid #1976d2',
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ color: "#fff", fontWeight: "600", fontSize: "0.95rem" }}>
+                          🎉 Promoción: {habitacion.promocion.descuento}% de descuento
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "#e3f2fd", display: "block", fontSize: "0.85rem" }}>
+                          Del {new Date(habitacion.promocion.fechainicio).toLocaleDateString()} al {new Date(habitacion.promocion.fechafin).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Paper>
+                </Fade>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* Sección de Reserva - Derecha */}
+          <Grid item xs={12} md={4}>
+            <Fade in={true} timeout={1400}>
+              <Box sx={{ position: { md: 'sticky', xs: 'static' }, top: '2rem' }}>
+                <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
                   <Typography
                     variant="h6"
                     sx={{
@@ -840,32 +768,31 @@ const DetallesHabitacion = () => {
                     Reservar Habitación
                   </Typography>
 
-                  <Box sx={{ display: "flex", gap: "1rem", mb: "1rem" }}>
-                    <TextField
-                      label="Llegada"
-                      type="datetime-local"
-                      name="fechainicio"
-                      value={reservation.fechainicio}
-                      onChange={handleReservationChange}
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: new Date().toISOString().slice(0, 16) }}
-                      sx={{ mb: 2 }}
-                      disabled={!isAvailable}
-                    />
-                    <TextField
-                      label="Salida"
-                      type="datetime-local"
-                      name="fechafin"
-                      value={reservation.fechafin}
-                      onChange={handleReservationChange}
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: reservation.fechainicio || new Date().toISOString().slice(0, 16) }}
-                      sx={{ mb: 2 }}
-                      disabled={!isAvailable}
-                    />
-                  </Box>
+                  <TextField
+                    label="Llegada"
+                    type="datetime-local"
+                    name="fechainicio"
+                    value={reservation.fechainicio}
+                    onChange={handleReservationChange}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    inputProps={{ min: new Date().toISOString().slice(0, 16) }}
+                    sx={{ mb: 2 }}
+                    disabled={!isAvailable}
+                  />
+                  
+                  <TextField
+                    label="Salida"
+                    type="datetime-local"
+                    name="fechafin"
+                    value={reservation.fechafin}
+                    onChange={handleReservationChange}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    inputProps={{ min: reservation.fechainicio || new Date().toISOString().slice(0, 16) }}
+                    sx={{ mb: 2 }}
+                    disabled={!isAvailable}
+                  />
 
                   <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel>Tipo de Tarifa</InputLabel>
@@ -902,7 +829,7 @@ const DetallesHabitacion = () => {
                     variant="caption"
                     sx={{ color: "#6c757d", textAlign: "center", mt: 1, display: "block" }}
                   >
-                    Aún no se te cobrará nada
+                    Continúa para seleccionar tu método de pago
                   </Typography>
                 </Card>
               </Box>

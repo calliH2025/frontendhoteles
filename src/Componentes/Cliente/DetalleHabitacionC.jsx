@@ -475,11 +475,14 @@ const DetallesHabitacion = () => {
     );
   };
 
-  const currentDate = new Date();
+  const nowCST = momentTz().tz('America/Mexico_City');
+  const promoStart = habitacion?.promocion?.fechainicio ? momentTz(habitacion.promocion.fechainicio, 'YYYY-MM-DD').tz('America/Mexico_City') : null;
+  const promoEnd = habitacion?.promocion?.fechafin ? momentTz(habitacion.promocion.fechafin, 'YYYY-MM-DD').tz('America/Mexico_City') : null;
   const hasActivePromotion =
     habitacion?.promocion?.descuento &&
-    new Date(habitacion.promocion.fechainicio) <= currentDate &&
-    new Date(habitacion.promocion.fechafin) >= currentDate;
+    promoStart && promoEnd &&
+    nowCST.isSameOrAfter(promoStart, 'day') &&
+    nowCST.isSameOrBefore(promoEnd, 'day');
 
   const getDiscountedPrice = (originalPrice) => {
     const price = Number(originalPrice);
@@ -652,7 +655,8 @@ const DetallesHabitacion = () => {
         </Fade>
 
         <Grid container spacing={4}>
-          <Grid item xs={12} lg={8}>
+          {/* Detalles de la Habitación */}
+          <Grid item xs={12} md={6}>
             <Fade in={true} timeout={1200}>
               <Card sx={styles.detailsCard}>
                 <CardContent sx={{ p: 4 }}>
@@ -737,10 +741,11 @@ const DetallesHabitacion = () => {
             </Fade>
           </Grid>
 
-          <Grid item xs={12} lg={4}>
+          {/* Tarifas */}
+          <Grid item xs={12} md={6}>
             <Fade in={true} timeout={1400}>
-              <Box sx={{ position: "sticky", top: "2rem" }}>
-                <Paper sx={styles.priceCard}>
+              <Box sx={{ position: { md: 'sticky', xs: 'static' }, top: '2rem' }}>
+                <Paper sx={{ ...styles.priceCard, p: 4 }}>
                   <Typography
                     variant="h6"
                     sx={{
@@ -818,9 +823,10 @@ const DetallesHabitacion = () => {
                       sx={{
                         mt: 3,
                         p: 2,
-                        backgroundColor: "rgba(255,235,59,0.2)",
+                        background: 'linear-gradient(90deg, #ffe082, #fffde7)',
                         borderRadius: "8px",
                         border: "1px solid rgba(255,235,59,0.3)",
+                        borderLeft: '6px solid #ffb300',
                       }}
                     >
                       <Typography variant="body2" sx={{ color: "#ffeb3b", fontWeight: "600" }}>
@@ -833,87 +839,90 @@ const DetallesHabitacion = () => {
                     </Box>
                   )}
                 </Paper>
-
-                <Card sx={styles.reservationCard}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: colors.accent,
-                      fontWeight: "600",
-                      mb: 2,
-                      textAlign: "center",
-                    }}
-                  >
-                    Reservar Habitación
-                  </Typography>
-
-                  <Box sx={{ display: "flex", gap: "1rem", mb: "1rem" }}>
-                    <TextField
-                      label="Llegada"
-                      type="datetime-local"
-                      name="fechainicio"
-                      value={reservation.fechainicio}
-                      onChange={handleReservationChange}
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: new Date().toISOString().slice(0, 16) }}
-                      sx={{ mb: 2 }}
-                      disabled={!isAvailable}
-                    />
-                    <TextField
-                      label="Salida"
-                      type="datetime-local"
-                      name="fechafin"
-                      value={reservation.fechafin}
-                      onChange={handleReservationChange}
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: reservation.fechainicio || new Date().toISOString().slice(0, 16) }}
-                      sx={{ mb: 2 }}
-                      disabled={!isAvailable}
-                    />
-                  </Box>
-
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>Tipo de Tarifa</InputLabel>
-                    <Select
-                      name="tipo_tarifa"
-                      value={reservation.tipo_tarifa}
-                      onChange={handleReservationChange}
-                      disabled={!isAvailable}
-                    >
-                      <MenuItem value="">Seleccione una tarifa</MenuItem>
-                      <MenuItem value="hora">Por Hora</MenuItem>
-                      <MenuItem value="dia">Por Día</MenuItem>
-                      <MenuItem value="noche">Por Noche</MenuItem>
-                      <MenuItem value="semana">Por Semana</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  {totalpagar !== null && (
-                    <Typography sx={styles.totalPrice}>
-                      Total: ${totalpagar} MXN
-                    </Typography>
-                  )}
-
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={handleReservation}
-                    disabled={!isAvailable || !reservation.fechainicio || !reservation.fechafin || !reservation.tipo_tarifa || !totalpagar}
-                    sx={styles.reserveButton}
-                  >
-                    Reservar
-                  </Button>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#6c757d", textAlign: "center", mt: 1, display: "block" }}
-                  >
-                    Continúa para seleccionar tu método de pago
-                  </Typography>
-                </Card>
               </Box>
             </Fade>
+          </Grid>
+
+          {/* Reserva (debajo, ocupa toda la fila) */}
+          <Grid item xs={12}>
+            <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, mt: 2 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: colors.accent,
+                  fontWeight: "600",
+                  mb: 2,
+                  textAlign: "center",
+                }}
+              >
+                Reservar Habitación
+              </Typography>
+
+              <Box sx={{ display: "flex", gap: "1rem", mb: "1rem" }}>
+                <TextField
+                  label="Llegada"
+                  type="datetime-local"
+                  name="fechainicio"
+                  value={reservation.fechainicio}
+                  onChange={handleReservationChange}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{ min: new Date().toISOString().slice(0, 16) }}
+                  sx={{ mb: 2 }}
+                  disabled={!isAvailable}
+                />
+                <TextField
+                  label="Salida"
+                  type="datetime-local"
+                  name="fechafin"
+                  value={reservation.fechafin}
+                  onChange={handleReservationChange}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{ min: reservation.fechainicio || new Date().toISOString().slice(0, 16) }}
+                  sx={{ mb: 2 }}
+                  disabled={!isAvailable}
+                />
+              </Box>
+
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Tipo de Tarifa</InputLabel>
+                <Select
+                  name="tipo_tarifa"
+                  value={reservation.tipo_tarifa}
+                  onChange={handleReservationChange}
+                  disabled={!isAvailable}
+                >
+                  <MenuItem value="">Seleccione una tarifa</MenuItem>
+                  <MenuItem value="hora">Por Hora</MenuItem>
+                  <MenuItem value="dia">Por Día</MenuItem>
+                  <MenuItem value="noche">Por Noche</MenuItem>
+                  <MenuItem value="semana">Por Semana</MenuItem>
+                </Select>
+              </FormControl>
+
+              {totalpagar !== null && (
+                <Typography sx={styles.totalPrice}>
+                  Total: ${totalpagar} MXN
+                </Typography>
+              )}
+
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleReservation}
+                disabled={!isAvailable || !reservation.fechainicio || !reservation.fechafin || !reservation.tipo_tarifa || !totalpagar}
+                sx={styles.reserveButton}
+              >
+                Reservar
+              </Button>
+              <Typography
+                variant="caption"
+                sx={{ color: "#6c757d", textAlign: "center", mt: 1, display: "block" }}
+              >
+                Continúa para seleccionar tu método de pago
+              </Typography>
+            </Card>
           </Grid>
         </Grid>
       </Container>

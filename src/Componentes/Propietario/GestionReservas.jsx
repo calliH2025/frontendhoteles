@@ -19,6 +19,7 @@ import {
   Button,
 } from "@mui/material";
 import moment from "moment-timezone";
+import "moment/locale/es";
 
 const GestionReservas = () => {
   const [reservas, setReservas] = useState({ fechasConfirmadas: [], Vencida: [] });
@@ -78,8 +79,8 @@ const GestionReservas = () => {
   };
 
   const formatDate = (dateString) => {
-    // Parse the date string explicitly as UTC and convert to CST
-    return moment.utc(dateString, "YYYY-MM-DD").tz("America/Mexico_City").format("DD MMMM");
+    // Parsear como local en la zona de México y mostrar el mes en español
+    return moment.tz(dateString, "YYYY-MM-DD", "America/Mexico_City").locale("es").format("DD MMMM");
   };
 
   const formatDateTime = (dateString) => {
@@ -189,7 +190,7 @@ const GestionReservas = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {reservas.Vencida.map((res) => (
+                      {reservas.Vencida.sort((a, b) => new Date(b.fechafin) - new Date(a.fechafin)).map((res) => (
                         <TableRow key={res.id_reserva}>
                           <TableCell>{`${res.nombre_cliente} ${res.apellido_paterno}`}</TableCell>
                           <TableCell>{res.cuarto}</TableCell>
@@ -251,7 +252,7 @@ const GestionReservas = () => {
                           <TableCell>{`${res.nombre_cliente} ${res.apellido_paterno}`}</TableCell>
                           <TableCell>{res.cuarto}</TableCell>
                           <TableCell>{formatDateTime(res.fechainicio)}</TableCell>
-                          <TableCell>{formatDateTime(res.fechainicio)}</TableCell>
+                          <TableCell>{formatDateTime(res.fechafin)}</TableCell>
                           <TableCell>${res.totalpagar}</TableCell>
                           <TableCell>{res.nombrehotel}</TableCell>
                         </TableRow>
