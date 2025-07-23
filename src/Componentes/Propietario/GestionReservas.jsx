@@ -84,8 +84,8 @@ const GestionReservas = () => {
   };
 
   const formatDateTime = (dateString) => {
-    // Parse the date string explicitly as UTC and convert to CST
-    return moment.utc(dateString).tz("America/Mexico_City").format("DD/MM/YYYY HH:mm");
+    // Mostrar la hora en formato de 12 horas con AM/PM
+    return moment.tz(dateString, 'America/Mexico_City').format('DD/MM/YYYY hh:mm A');
   };
 
   const modalStyle = {
