@@ -151,8 +151,8 @@ export default function MisReservas() {
 
   const handleCancelReservation = async (id_reserva) => {
     const result = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡Esta acción cancelará tu reserva!",
+      title: "¿Estás seguro de cancelar tu reserva?",
+      text: "Al hacerlo, no podrás recuperarla y no se realizará ningún reembolso del monto pagado.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#dc3545",
