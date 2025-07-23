@@ -29,6 +29,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import BedIcon from '@mui/icons-material/Bed';
+import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -1141,7 +1143,7 @@ const Hoteles = () => {
         <Table sx={{ minWidth: 650 }} aria-label="tabla de hoteles">
           <TableHead sx={{ background: 'linear-gradient(135deg, #4c94bc, #549c94)' }}>
             <TableRow>
-              {['Nombre', 'Dirección', 'Habitaciones', 'Servicios', 'Latitud', 'Longitud', 'Imagen', 'Teléfono', 'Acciones'].map((head) => (
+              {['Nombre', 'Dirección', 'Habitaciones', 'Servicios', 'Imagen', 'Teléfono', 'Acciones'].map((head) => (
                 <TableCell
                   key={head}
                   sx={{
@@ -1173,8 +1175,6 @@ const Hoteles = () => {
                 <TableCell sx={{ color: '#549c94', fontWeight: '500' }}>{hotel.direccion || 'Sin dirección'}</TableCell>
                 <TableCell sx={{ color: '#4c94bc', fontWeight: '600', textAlign: 'center' }}>{hotel.numhabitacion}</TableCell>
                 <TableCell sx={{ color: '#549c94', fontWeight: '500' }}>{hotel.servicios.join(', ') || 'Sin servicios'}</TableCell>
-                <TableCell sx={{ color: '#4c94bc', fontWeight: '500' }}>{hotel.latitud || 'N/A'}</TableCell>
-                <TableCell sx={{ color: '#4c94bc', fontWeight: '500' }}>{hotel.longitud || 'N/A'}</TableCell>
                 <TableCell>
                   {hotel.imagen && hotel.imagen.data ? (
                     <img
@@ -1245,7 +1245,9 @@ const Hoteles = () => {
                         transition: 'all 0.3s ease',
                       }}
                     >
-                      <VisibilityIcon sx={{ fontSize: '18px' }} />
+                      <Tooltip title="Habitaciones del Hotel" arrow>
+                        <span><BedIcon sx={{ fontSize: '18px' }} /></span>
+                      </Tooltip>
                     </IconButton>
                   </Box>
                 </TableCell>

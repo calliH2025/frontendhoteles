@@ -25,14 +25,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import ImageIcon from '@mui/icons-material/Image';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../Autenticacion/AuthContext';
 import Swal from 'sweetalert2';
 
-const API_BASE_URL = 'https://backendreservas-m2zp.onrender.com';
+const API_BASE_URL = 'https://backendreservas-m2zp.onrender.com'; 
 
 const Cuartos = () => {
   const navigate = useNavigate();
+  const { id: idHotelParam } = useParams(); // Nuevo: obtener id del hotel de la URL
   const { user, logout } = useAuth();
   const [cuartos, setCuartos] = useState([]);
   const [hoteles, setHoteles] = useState([]);
@@ -86,11 +87,17 @@ const Cuartos = () => {
     };
 
     loadData();
-  }, [navigate, user, logout]);
+  }, [navigate, user, logout, idHotelParam]); // Agregar idHotelParam como dependencia
 
+  // Modificado: Si hay idHotelParam, filtrar por hotel, si no, traer todos
   const fetchCuartos = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/cuartos`);
+      let response;
+      if (idHotelParam) {
+        response = await axios.get(`${API_BASE_URL}/api/cuartos/hotel/${idHotelParam}`);
+      } else {
+        response = await axios.get(`${API_BASE_URL}/api/cuartos`);
+      }
       const cuartosWithImages = response.data.map(cuarto => ({
         ...cuarto,
         imagenPreview: cuarto.imagenhabitacion ? `data:image/jpeg;base64,${cuarto.imagenhabitacion}` : null,
