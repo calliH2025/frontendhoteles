@@ -143,6 +143,7 @@ const PaginaPrincipalCliente = () => {
             backgroundPosition: "center",
             color: "#1e1e1e",
             overflow: "hidden",
+            px: { xs: 1, sm: 2, md: 0 },
           }}
         >
           <Box
@@ -155,19 +156,19 @@ const PaginaPrincipalCliente = () => {
             }}
           />
 
-          <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, py: 8 }}>
+          <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, py: { xs: 4, sm: 6, md: 8 } }}>
             <Fade in timeout={1000}>
-              <Box sx={{ textAlign: "center", py: { xs: 6, md: 10 } }}>
+              <Box sx={{ textAlign: "center", py: { xs: 4, sm: 6, md: 10 } }}>
                 <Typography
                   variant="h1"
-                  sx={{ mb: 3, lineHeight: 1.2 }}
+                  sx={{ mb: { xs: 2, md: 3 }, lineHeight: 1.2, fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" } }}
                   aria-label="Encuentra tu hotel ideal"
                 >
                   Encuentra tu hotel ideal
                 </Typography>
                 <Typography
                   variant="body1"
-                  sx={{ maxWidth: 700, mx: "auto", mb: 5, fontSize: { xs: "1rem", md: "1.2rem" } }}
+                  sx={{ maxWidth: 700, mx: "auto", mb: { xs: 3, md: 5 }, fontSize: { xs: "1rem", md: "1.2rem" } }}
                 >
                   Descubre alojamientos perfectos para tus vacaciones o viajes de trabajo con facilidad.
                 </Typography>
@@ -179,13 +180,13 @@ const PaginaPrincipalCliente = () => {
                     sx={{
                       maxWidth: 1000,
                       mx: "auto",
-                      p: { xs: 2, sm: 3 },
+                      p: { xs: 1, sm: 2, md: 3 },
                       backgroundColor: "background.paper",
                     }}
                     role="form"
                     aria-label="Formulario de búsqueda de hoteles"
                   >
-                    <Grid container spacing={2} alignItems="center">
+                    <Grid container spacing={{ xs: 2, sm: 2, md: 3 }} alignItems="center">
                       <Grid item xs={12} sm={6} md={3}>
                         <TextField
                           fullWidth
@@ -247,7 +248,7 @@ const PaginaPrincipalCliente = () => {
                           color="primary"
                           fullWidth
                           endIcon={<ArrowRight />}
-                          sx={{ py: 1.5, fontSize: "1rem" }}
+                          sx={{ py: { xs: 1, sm: 1.5 }, fontSize: { xs: "0.95rem", sm: "1rem" } }}
                           aria-label="Buscar hoteles"
                         >
                           Buscar

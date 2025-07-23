@@ -104,7 +104,8 @@ const PaginaPrincipalPropietario = () => {
           minHeight: "100vh",
           background: "linear-gradient(135deg, #f9fafb 0%, #e0e7ff 100%)",
           color: muiTheme.palette.text.primary,
-          py: 10,
+          py: { xs: 4, sm: 6, md: 10 },
+          px: { xs: 1, sm: 2, md: 0 },
           position: "relative",
           overflow: "hidden",
         }}
@@ -121,10 +122,10 @@ const PaginaPrincipalPropietario = () => {
             zIndex: 0,
           }}
         />
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, px: { xs: 1, sm: 2, md: 0 } }}>
           <Fade in timeout={1500}>
-            <Box sx={{ textAlign: "center", mb: 10 }}>
-              <Typography variant="h1" gutterBottom sx={{ textShadow: "1px 1px 4px rgba(0, 0, 0, 0.1)" }}>
+            <Box sx={{ textAlign: "center", mb: { xs: 5, md: 10 } }}>
+              <Typography variant="h1" gutterBottom sx={{ textShadow: "1px 1px 4px rgba(0, 0, 0, 0.1)", fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" } }}>
                 Panel del Propietario
               </Typography>
               <Typography
@@ -134,7 +135,8 @@ const PaginaPrincipalPropietario = () => {
                   mx: "auto",
                   color: muiTheme.palette.text.secondary,
                   fontWeight: 500,
-                  mb: 4,
+                  mb: { xs: 3, md: 4 },
+                  fontSize: { xs: "1rem", sm: "1.1rem" },
                 }}
               >
                 Toma el control total de tus propiedades, gestiona reservas y descubre insights valiosos con un diseño elegante y funcional.
@@ -143,7 +145,7 @@ const PaginaPrincipalPropietario = () => {
                 variant="contained"
                 color="primary"
                 size="large"
-                sx={{ px: 4, py: 1.5, borderRadius: 12 }}
+                sx={{ px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 }, borderRadius: 12, fontSize: { xs: "1rem", sm: "1.1rem" } }}
               >
                 ¡Explora Ahora!
               </Button>
@@ -151,7 +153,7 @@ const PaginaPrincipalPropietario = () => {
           </Fade>
 
           <Slide in timeout={1500} direction="up">
-            <Grid container spacing={6}>
+            <Grid container spacing={{ xs: 3, sm: 4, md: 6 }}>
               {[
                 { title: "Gestionar Propiedades", desc: "Actualiza y supervisa tus hoteles con facilidad.", icon: Business },
                 { title: "Controlar Reservas", desc: "Revisa y administra las reservas de tus alojamientos.", icon: EventSeat },
@@ -169,35 +171,36 @@ const PaginaPrincipalPropietario = () => {
                       background: "linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)",
                       overflow: "hidden",
                       position: "relative",
+                      minHeight: { xs: 260, sm: 300 },
                     }}
                   >
                     <CardMedia
                       component="div"
                       sx={{
-                        height: 120,
+                        height: { xs: 80, sm: 120 },
                         background: `linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(107, 114, 128, 0.05) 100%)`,
                       }}
                     />
-                    <CardContent sx={{ p: 4, textAlign: "center" }}>
+                    <CardContent sx={{ p: { xs: 2, sm: 4 }, textAlign: "center" }}>
                       <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
-                        <item.icon sx={{ fontSize: "3rem", color: index === 2 ? muiTheme.palette.secondary.main : muiTheme.palette.primary.main }} />
+                        <item.icon sx={{ fontSize: { xs: "2.2rem", sm: "3rem" }, color: index === 2 ? muiTheme.palette.secondary.main : muiTheme.palette.primary.main }} />
                         {index === 0 && (
                           <IconButton sx={{ position: "absolute", top: 10, right: 10 }}>
                             <Star color="primary" />
                           </IconButton>
                         )}
                       </Box>
-                      <Typography variant="h2" gutterBottom>
+                      <Typography variant="h2" gutterBottom sx={{ fontSize: { xs: "1.3rem", sm: "2.25rem" } }}>
                         {item.title}
                       </Typography>
-                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: { xs: 2, sm: 4 }, fontSize: { xs: "1rem", sm: "1.1rem" } }}>
                         {item.desc}
                       </Typography>
                       <Button
                         variant="contained"
                         color={index === 2 ? "secondary" : "primary"}
                         endIcon={<ArrowForward />}
-                        sx={{ mt: 2, px: 3, py: 1.5, borderRadius: 12 }}
+                        sx={{ mt: 2, px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.5 }, borderRadius: 12, fontSize: { xs: "0.95rem", sm: "1.05rem" } }}
                       >
                         {item.title}
                       </Button>
@@ -208,14 +211,14 @@ const PaginaPrincipalPropietario = () => {
             </Grid>
           </Slide>
 
-          <Divider sx={{ my: 8, borderColor: "rgba(107, 114, 128, 0.2)" }} />
+          <Divider sx={{ my: { xs: 4, sm: 6, md: 8 }, borderColor: "rgba(107, 114, 128, 0.2)" }} />
 
           <Fade in timeout={1500}>
-            <Box sx={{ textAlign: "center", mb: 6 }}>
-              <Typography variant="h3" gutterBottom>
+            <Box sx={{ textAlign: "center", mb: { xs: 3, sm: 6 } }}>
+              <Typography variant="h3" gutterBottom sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}>
                 Tu éxito comienza aquí
               </Typography>
-              <Typography variant="body1" sx={{ maxWidth: "600px", mx: "auto", color: muiTheme.palette.text.secondary, mb: 4 }}>
+              <Typography variant="body1" sx={{ maxWidth: "600px", mx: "auto", color: muiTheme.palette.text.secondary, mb: { xs: 2, sm: 4 }, fontSize: { xs: "1rem", sm: "1.1rem" } }}>
                 Con herramientas modernas y un diseño intuitivo, optimiza la gestión de tus propiedades hoy mismo.
               </Typography>
             </Box>

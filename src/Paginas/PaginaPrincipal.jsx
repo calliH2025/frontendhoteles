@@ -752,8 +752,10 @@ const PaginaPrincipal = () => {
         {/* Hero Section */}
         <Box
           sx={{
+            minHeight: { xs: '60vh', sm: '70vh', md: '85vh' },
+            py: { xs: 4, sm: 6, md: 10 },
+            px: { xs: 1, sm: 2, md: 0 },
             position: "relative",
-            minHeight: "85vh",
             display: "flex",
             alignItems: "center",
             background: `
@@ -766,15 +768,14 @@ const PaginaPrincipal = () => {
             overflow: "hidden",
           }}
         >
-          <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
+          <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 0 }, position: "relative", zIndex: 2 }}>
             <Fade in timeout={800}>
-              <Box sx={{ textAlign: "center", py: { xs: 6, md: 10 } }}>
+              <Box sx={{ textAlign: "center", py: { xs: 4, sm: 6, md: 10 } }}>
                 <AnimatedBox>
                   <Typography
                     variant="h1"
                     sx={{
-                      mb: 3,
-                      fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem" },
+                      fontSize: { xs: "2rem", sm: "2.8rem", md: "4.5rem" },
                       fontFamily: "'Poppins', sans-serif",
                       fontWeight: 800,
                       background:
@@ -798,16 +799,16 @@ const PaginaPrincipal = () => {
                   <Typography
                     variant="h5"
                     sx={{
-                      maxWidth: 700,
+                      maxWidth: { xs: 320, sm: 500, md: 700 },
+                      fontSize: { xs: "1.1rem", sm: "1.3rem", md: "1.5rem" },
                       mx: "auto",
-                      mb: 6,
+                      mb: { xs: 3, md: 6 },
                       color: "#333",
                       fontWeight: 400,
                       lineHeight: 1.5,
                     }}
                   >
-                    Descubre alojamientos únicos y experiencias inolvidables para tu próxima aventura en esta temporada
-                    especial de Xantolo
+                    Descubre alojamientos únicos y experiencias inolvidables para tu próxima aventura en esta temporada especial de Xantolo
                   </Typography>
                 </AnimatedBox>
                 <Slide in timeout={1000} direction="up">
@@ -818,7 +819,7 @@ const PaginaPrincipal = () => {
                     sx={{
                       maxWidth: 1000,
                       mx: "auto",
-                      p: { xs: 2, sm: 3, md: 4 },
+                      p: { xs: 1, sm: 2, md: 4 },
                       backgroundColor: "rgba(255, 255, 255, 0.98)",
                       backdropFilter: "blur(20px)",
                       borderRadius: 4,
@@ -826,8 +827,8 @@ const PaginaPrincipal = () => {
                       border: "1px solid rgba(255, 107, 53, 0.1)",
                     }}
                   >
-                    <Grid container spacing={3} alignItems="center">
-                      <Grid item xs={12} md={3}>
+                    <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
+                      <Grid item xs={12} sm={6} md={3}>
                         <TextField
                           fullWidth
                           placeholder="¿A dónde quieres ir?"
@@ -844,7 +845,7 @@ const PaginaPrincipal = () => {
                           sx={{ backgroundColor: "white" }}
                         />
                       </Grid>
-                      <Grid item xs={6} md={2.5}>
+                      <Grid item xs={6} sm={3} md={2.5}>
                         <TextField
                           fullWidth
                           type="date"
@@ -862,7 +863,7 @@ const PaginaPrincipal = () => {
                           sx={{ backgroundColor: "white" }}
                         />
                       </Grid>
-                      <Grid item xs={6} md={2.5}>
+                      <Grid item xs={6} sm={3} md={2.5}>
                         <TextField
                           fullWidth
                           type="date"
@@ -880,7 +881,7 @@ const PaginaPrincipal = () => {
                           sx={{ backgroundColor: "white" }}
                         />
                       </Grid>
-                      <Grid item xs={6} md={2}>
+                      <Grid item xs={6} sm={3} md={2}>
                         <TextField
                           fullWidth
                           type="number"
@@ -898,7 +899,7 @@ const PaginaPrincipal = () => {
                           sx={{ backgroundColor: "white" }}
                         />
                       </Grid>
-                      <Grid item xs={6} md={2}>
+                      <Grid item xs={6} sm={3} md={2}>
                         <Button
                           type="submit"
                           variant="contained"
@@ -930,12 +931,12 @@ const PaginaPrincipal = () => {
           <Box
             sx={{
               background: "linear-gradient(135deg, rgba(139, 69, 19, 0.05) 0%, rgba(160, 82, 45, 0.08) 100%)",
-              py: 6,
+              py: { xs: 3, sm: 5, md: 6 },
               position: "relative",
             }}
           >
-            <Container maxWidth="lg" sx={{ py: 4, position: "relative", zIndex: 1 }}>
-              <Box sx={{ mb: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 0 }, position: "relative", zIndex: 1 }}>
+              <Box sx={{ mb: { xs: 3, md: 6 }, flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 2, md: 0 } }}>
                 <Box>
                   <Chip
                     label="🎭 EXPERIENCIAS ÚNICAS 🎭"
@@ -1038,10 +1039,10 @@ const PaginaPrincipal = () => {
               </Box>
               <Box
                 sx={{
+                  height: { xs: 250, sm: 320, md: 400 },
                   position: "relative",
                   overflow: "hidden",
                   borderRadius: "16px",
-                  height: 400,
                   boxShadow: "0 8px 32px rgba(139, 69, 19, 0.15)",
                   border: "3px solid #D2B48C",
                 }}

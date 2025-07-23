@@ -61,42 +61,69 @@ const PaginaPrincipalAdministrativa = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ minHeight: "100vh", backgroundColor: "background.default", color: "text.primary", py: 6 }}>
-        <Container maxWidth="lg">
+      <Box sx={{ minHeight: "100vh", backgroundColor: "background.default", color: "text.primary", py: { xs: 3, sm: 5, md: 6 } }}>
+        <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 0 } }}>
           <Fade in timeout={1000}>
-            <Box sx={{ textAlign: "center", mb: 6 }}>
-              <Typography variant="h1" gutterBottom>
+            <Box sx={{ textAlign: "center", mb: { xs: 3, md: 6 } }}>
+              <Typography variant="h1" gutterBottom sx={{ fontSize: { xs: "2rem", sm: "2.5rem", md: "2.75rem" } }}>
                 Panel Administrativo
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" sx={{ fontSize: { xs: "1rem", sm: "1.1rem" } }}>
                 Gestiona alojamientos, usuarios y reportes desde un solo lugar.
               </Typography>
             </Box>
           </Fade>
 
           <Slide in timeout={1000} direction="up">
-            <Grid container spacing={4}>
-              {["Administrar Alojamientos", "Gestionar Usuarios", "Ver Reportes"].map((title, index) => (
+            <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+              {[
+                "Administrar Alojamientos",
+                "Gestionar Usuarios",
+                "Ver Reportes",
+              ].map((title, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card elevation={3} sx={{ textAlign: "center", py: 4 }}>
-                    <CardContent>
-                      <Box sx={{ mb: 2 }}>
-                        {index === 0 && <Hotel color="primary" />}
-                        {index === 1 && <Group color="primary" />}
-                        {index === 2 && <BarChart color="secondary" />}
+                  <Card
+                    elevation={3}
+                    sx={{
+                      textAlign: "center",
+                      py: { xs: 3, sm: 4 },
+                      px: { xs: 1, sm: 2 },
+                      borderRadius: "18px",
+                      boxShadow: {
+                        xs: "0 2px 8px rgba(79,70,229,0.08)",
+                        md: "0 4px 20px rgba(16,185,129,0.10)"
+                      },
+                      minHeight: { xs: 220, sm: 260 },
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      transition: "all 0.3s",
+                      '&:hover': {
+                        boxShadow: "0 8px 32px rgba(16,185,129,0.15)",
+                        transform: "translateY(-4px) scale(1.03)",
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ p: 0 }}>
+                      <Box sx={{ mb: 2, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        {index === 0 && <Hotel color="primary" sx={{ fontSize: { xs: 36, sm: 44 } }} />}
+                        {index === 1 && <Group color="primary" sx={{ fontSize: { xs: 36, sm: 44 } }} />}
+                        {index === 2 && <BarChart color="secondary" sx={{ fontSize: { xs: 36, sm: 44 } }} />}
                       </Box>
-                      <Typography variant="h6" gutterBottom>
+                      <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
                         {title}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: "0.95rem", sm: "1rem" }, mb: { xs: 2, sm: 3 } }}>
                         Realiza acciones administrativas de forma sencilla.
                       </Typography>
                       <Button
                         variant="contained"
                         color={index === 2 ? "secondary" : "primary"}
                         endIcon={<ArrowForward />}
-                        sx={{ mt: 3 }}
+                        sx={{ mt: { xs: 1, sm: 3 }, fontSize: { xs: "0.95rem", sm: "1.05rem" }, px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 } }}
                         onClick={() => handleNavigation(title)}
+                        fullWidth
                       >
                         {title}
                       </Button>
