@@ -85,7 +85,7 @@ const GestionReservas = () => {
 
   const formatDateTime = (dateString) => {
     // Mostrar la hora en formato de 12 horas con AM/PM
-    return moment.tz(dateString, 'America/Mexico_City').format('DD/MM/YYYY hh:mm A');
+    return moment(dateString).format('DD/MM/YYYY hh:mm A');
   };
 
   const modalStyle = {
