@@ -206,33 +206,6 @@ const EncabezadoPublico = () => {
           }
           .mobile-menu-icon {
             display: flex;
-            position: absolute;
-            top: 18px;
-            right: 18px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .header {
-            padding: 0;
-            min-height: 56px;
-          }
-          .logo img {
-            width: 36px;
-            height: 36px;
-          }
-          .logo h3 {
-            font-size: 0.95rem;
-            max-width: 80px;
-          }
-          .menu ul {
-            width: 98vw;
-            max-width: 99vw;
-            padding: 24px 8px 8px 8px;
-          }
-          .menu ul li {
-            font-size: 1rem;
-            padding: 16px 6px;
           }
         }
       `}</style>
