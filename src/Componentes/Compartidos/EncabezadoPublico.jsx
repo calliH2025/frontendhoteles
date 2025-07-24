@@ -80,34 +80,28 @@ const EncabezadoPublico = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 5vw;
+          padding: 20px 15px; 
           background-color: var(--color-primary);
           color: var(--color-secondary);
-          position: relative;
-          z-index: 100;
         }
 
         .logo {
           display: flex;
           align-items: center;
           flex: 1;
-          min-width: 0;
         }
 
         .logo img {
-          width: 44px;
-          height: 44px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
           margin-right: 10px;
         }
 
         .logo h3 {
-          font-size: 1.1rem;
+          font-size: 1.2rem;
           font-weight: bold;
           color: var(--color-secondary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
 
         .menu ul {
@@ -144,20 +138,12 @@ const EncabezadoPublico = () => {
           flex-direction: column;
           cursor: pointer;
           gap: 4px;
-          z-index: 200;
         }
 
         .hamburger {
           width: 25px;
           height: 3px;
           background-color: var(--color-secondary);
-          border-radius: 2px;
-        }
-
-        @media (max-width: 1024px) {
-          .header {
-            padding: 14px 2vw;
-          }
         }
 
         @media (max-width: 768px) {
@@ -166,14 +152,12 @@ const EncabezadoPublico = () => {
             position: fixed;
             top: 0;
             left: -100%;
-            width: 70vw;
-            max-width: 320px;
-            height: 100vh;
+            width: 70%;
+            height: 100%;
             background-color: var(--color-mobile-bg);
-            padding: 32px 20px 20px 20px;
-            transition: left 0.3s cubic-bezier(.77,0,.18,1);
-            box-shadow: 2px 0 8px rgba(0,0,0,0.18);
-            z-index: 150;
+            padding: 20px;
+            transition: left 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
           }
 
           .menu.menu-open ul {
@@ -181,42 +165,13 @@ const EncabezadoPublico = () => {
           }
 
           .menu ul li {
-            padding: 20px 10px;
+            padding: 20px;
             border-bottom: 1px solid var(--color-hover);
             color: var(--color-mobile-text);
-            font-size: 1.1rem;
           }
 
           .mobile-menu-icon {
             display: flex;
-          }
-
-          .logo h3 {
-            font-size: 1rem;
-            max-width: 120px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .header {
-            padding: 10px 2vw;
-          }
-          .logo img {
-            width: 36px;
-            height: 36px;
-          }
-          .logo h3 {
-            font-size: 0.95rem;
-            max-width: 80px;
-          }
-          .menu ul {
-            width: 90vw;
-            max-width: 98vw;
-            padding: 24px 8px 8px 8px;
-          }
-          .menu ul li {
-            font-size: 1rem;
-            padding: 16px 6px;
           }
         }
       `}</style>
