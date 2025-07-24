@@ -80,34 +80,28 @@ const EncabezadoPublico = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 5vw;
+          padding: 20px 15px; 
           background-color: var(--color-primary);
           color: var(--color-secondary);
-          position: relative;
-          z-index: 100;
         }
 
         .logo {
           display: flex;
           align-items: center;
           flex: 1;
-          min-width: 0;
         }
 
         .logo img {
-          width: 44px;
-          height: 44px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
           margin-right: 10px;
         }
 
         .logo h3 {
-          font-size: 1.1rem;
+          font-size: 1.2rem;
           font-weight: bold;
           color: var(--color-secondary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
 
         .menu ul {
@@ -116,6 +110,7 @@ const EncabezadoPublico = () => {
           list-style: none;
           margin: 0;
           padding: 0;
+          z-index: 2000;
         }
 
         .menu ul li {
@@ -144,72 +139,68 @@ const EncabezadoPublico = () => {
           flex-direction: column;
           cursor: pointer;
           gap: 4px;
-          z-index: 200;
         }
 
         .hamburger {
           width: 25px;
           height: 3px;
           background-color: var(--color-secondary);
-          border-radius: 2px;
         }
 
-        @media (max-width: 1024px) {
-          .header {
-            padding: 14px 2vw;
-          }
+        .menu-overlay {
+          display: block;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(44, 62, 80, 0.45);
+          z-index: 1500;
+          transition: opacity 0.3s;
         }
 
         @media (max-width: 768px) {
-          .header {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 0 0 0 0;
-            min-height: 64px;
-          }
-          .logo {
-            justify-content: center;
-            padding: 12px 0 8px 0;
-          }
-          .logo h3 {
-            font-size: 1rem;
-            max-width: 120px;
-            text-align: center;
-          }
-          .menu {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-          }
           .menu ul {
             flex-direction: column;
             position: fixed;
             top: 0;
             left: -100%;
-            width: 80vw;
-            max-width: 340px;
-            height: 100vh;
+            width: 70%;
+            height: 100%;
             background-color: var(--color-mobile-bg);
-            padding: 32px 20px 20px 20px;
-            transition: left 0.3s cubic-bezier(.77,0,.18,1);
-            box-shadow: 2px 0 8px rgba(0,0,0,0.18);
-            z-index: 150;
+            padding: 20px;
+            transition: left 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            z-index: 2000;
           }
+
           .menu.menu-open ul {
             left: 0;
           }
+
           .menu ul li {
-            padding: 20px 10px;
+            padding: 20px;
             border-bottom: 1px solid var(--color-hover);
             color: var(--color-mobile-text);
-            font-size: 1.1rem;
           }
+
           .mobile-menu-icon {
             display: flex;
+          }
+          .menu-overlay {
+            display: block;
+          }
+        }
+        @media (min-width: 769px) {
+          .menu-overlay {
+            display: none;
           }
         }
       `}</style>
 
+      {isMobileMenuOpen && (
+        <div className="menu-overlay" onClick={toggleMobileMenu}></div>
+      )}
       <header className="header">
         <div className="logo">
           {logoUrl && (
