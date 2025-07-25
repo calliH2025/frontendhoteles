@@ -185,19 +185,6 @@ const HotelesC = () => {
     setSelectedService(event.target.value)
   }
 
-  if (loading) {
-    return (
-      <Backdrop open={loading} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Box sx={{ textAlign: "center" }}>
-          <CircularProgress color="inherit" size={60} />
-          <Typography variant="h6" sx={{ mt: 2, color: "white" }}>
-            Cargando hoteles exclusivos...
-          </Typography>
-        </Box>
-      </Backdrop>
-    )
-  }
-
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f8fafc" }}>
       {/* Filter Section Mejorado */}

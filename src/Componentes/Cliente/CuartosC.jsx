@@ -157,8 +157,8 @@ const CuartosP = ({ idHotel }) => {
         }
         return {
           ...cuarto,
-          imagenhabitacion: imagenParsed,
-          tipohabitacion: cuarto.idtipohabitacion // Asumimos que idtipohabitacion podría ser un ID que necesitaría mapeo a un nombre en el futuro
+          imagenhabitacion: imagenParsed
+          // Ya no sobrescribas tipohabitacion, así se mostrará el nombre que viene del backend
         };
       });
       setCuartos(cuartosData);
