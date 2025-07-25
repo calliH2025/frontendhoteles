@@ -188,7 +188,7 @@ const HotelesC = () => {
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f8fafc" }}>
       {/* Filter Section Mejorado */}
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4, px: { xs: 1, sm: 2, md: 3 } }}>
         <Paper
           elevation={0}
           sx={{
@@ -295,6 +295,7 @@ const HotelesC = () => {
                     position: "relative",
                     background: "linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%)",
                     boxShadow: "0 4px 24px rgba(25, 118, 210, 0.07)",
+                    // Eliminar cualquier maxWidth o width fijo para que sea flexible
                     "&:hover": {
                       transform: "translateY(-12px) scale(1.02)",
                       boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",

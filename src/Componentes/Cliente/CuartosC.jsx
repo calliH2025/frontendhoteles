@@ -220,7 +220,7 @@ const CuartosP = ({ idHotel }) => {
             const isAvailable = cuarto.estado?.toLowerCase() === 'disponible';
 
             return (
-              <Grid item xs={12} sm={6} md={4} key={cuarto.id}>
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={cuarto.id}>
                 <Fade in={true} timeout={800 + index * 100}>
                   <Card
                     sx={{
