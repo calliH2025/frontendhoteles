@@ -132,6 +132,7 @@ const EncabezadoCliente = () => {
           list-style: none;
           margin: 0;
           padding: 0;
+          z-index: 2000;
         }
 
         .menu ul li {
@@ -169,6 +170,18 @@ const EncabezadoCliente = () => {
           background-color: var(--color-secondary);
         }
 
+        .menu-overlay {
+          display: block;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(44, 62, 80, 0.45);
+          z-index: 1500;
+          transition: opacity 0.3s;
+        }
+
         @media (max-width: 768px) {
           .menu ul {
             display: none;
@@ -181,6 +194,7 @@ const EncabezadoCliente = () => {
             background-color: var(--color-primary);
             padding: 20px;
             transition: left 0.3s ease-in-out;
+            z-index: 2000;
           }
 
           .menu.menu-open ul {
@@ -191,8 +205,20 @@ const EncabezadoCliente = () => {
           .mobile-menu-icon {
             display: flex;
           }
+          .menu-overlay {
+            display: block;
+          }
+        }
+        @media (min-width: 769px) {
+          .menu-overlay {
+            display: none;
+          }
         }
       `}</style>
+
+      {isMobileMenuOpen && (
+        <div className="menu-overlay" onClick={toggleMobileMenu}></div>
+      )}
 
       <header className="header">
         <div className="logo">

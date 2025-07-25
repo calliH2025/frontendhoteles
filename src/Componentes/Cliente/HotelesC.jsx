@@ -37,7 +37,6 @@ import {
   Navigation,
   Hotel,
   LocalOffer,
-  PhotoCamera,
 } from "@mui/icons-material"
 
 // Lista de servicios disponibles
@@ -201,87 +200,6 @@ const HotelesC = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f8fafc" }}>
-      {/* Hero Section Mejorado */}
-      <Box
-        sx={{
-          background: theme.background.gradient,
-          position: "relative",
-          overflow: "hidden",
-          py: { xs: 8, md: 12 },
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)",
-          },
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            top: "-50%",
-            right: "-20%",
-            width: "40%",
-            height: "200%",
-            background: "radial-gradient(ellipse, rgba(255,255,255,0.1) 0%, transparent 70%)",
-            transform: "rotate(45deg)",
-          },
-        }}
-      >
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Box sx={{ textAlign: "center" }}>
-            <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mb: 3 }}>
-              <Avatar sx={{ bgcolor: theme.accent.main, width: 56, height: 56 }}>
-                <Hotel fontSize="large" />
-              </Avatar>
-            </Stack>
-
-            <Typography
-              variant="h2"
-              sx={{
-                color: "white",
-                fontWeight: 800,
-                mb: 2,
-                fontSize: { xs: "2.5rem", md: "3.5rem" },
-                textShadow: "0 4px 8px rgba(0,0,0,0.3)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Hoteles Exclusivos
-            </Typography>
-
-            <Typography
-              variant="h5"
-              sx={{
-                color: "rgba(255,255,255,0.9)",
-                fontWeight: 300,
-                mb: 4,
-                maxWidth: 600,
-                mx: "auto",
-                lineHeight: 1.6,
-              }}
-            >
-              Descubre experiencias únicas en nuestros destinos cuidadosamente seleccionados
-            </Typography>
-
-            <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
-              <Chip
-                icon={<Hotel />}
-                label={`${hoteles.length} Hoteles Disponibles`}
-                sx={{
-                  bgcolor: "rgba(255,255,255,0.2)",
-                  color: "white",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  fontWeight: 600,
-                }}
-              />
-            </Stack>
-          </Box>
-        </Container>
-      </Box>
-
       {/* Filter Section Mejorado */}
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper
@@ -373,7 +291,7 @@ const HotelesC = () => {
         {/* Grid de Hoteles Mejorado */}
         <Grid container spacing={3}>
           {filteredHoteles.map((hotel, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={hotel.id}>
+            <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={hotel.id}>
               <Fade in={true} timeout={300 + index * 100}>
                 <Card
                   onMouseEnter={() => setHoveredCard(hotel.id)}
@@ -388,6 +306,8 @@ const HotelesC = () => {
                     transition: "all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)",
                     cursor: "pointer",
                     position: "relative",
+                    background: "linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%)",
+                    boxShadow: "0 4px 24px rgba(25, 118, 210, 0.07)",
                     "&:hover": {
                       transform: "translateY(-12px) scale(1.02)",
                       boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
@@ -440,12 +360,18 @@ const HotelesC = () => {
                     >
                       <Button
                         variant="contained"
-                        startIcon={<PhotoCamera />}
+                        startIcon={<Bed />}
                         onClick={() => handleImageClick(hotel)}
                         sx={{
                           bgcolor: "rgba(255,255,255,0.9)",
                           color: theme.primary.main,
                           backdropFilter: "blur(10px)",
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          borderRadius: 2,
+                          px: 3,
+                          py: 1.2,
+                          boxShadow: "0 2px 8px rgba(25, 118, 210, 0.12)",
                           "&:hover": {
                             bgcolor: "white",
                             transform: "scale(1.05)",
@@ -572,27 +498,6 @@ const HotelesC = () => {
 
                     <Divider sx={{ my: 2, borderColor: "#e5e7eb" }} />
 
-                    {/* Rating */}
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#374151" }}>
-                        Tu valoración:
-                      </Typography>
-                      <Rating
-                        name={`rating-${hotel.id}`}
-                        value={ratings[hotel.id] || 0}
-                        onChange={(event, newValue) => handleRatingChange(hotel.id, newValue)}
-                        precision={0.5}
-                        size="small"
-                        emptyIcon={<StarBorder fontSize="inherit" />}
-                        icon={<Star fontSize="inherit" />}
-                        sx={{
-                          color: theme.accent.main,
-                          "& .MuiRating-icon": {
-                            fontSize: "1.1rem",
-                          },
-                        }}
-                      />
-                    </Stack>
                   </CardContent>
 
                   {/* Acciones */}

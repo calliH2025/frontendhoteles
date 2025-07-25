@@ -195,19 +195,6 @@ const CuartosP = ({ idHotel }) => {
   return (
     <Box sx={styles.container}>
       <Container maxWidth="xl">
-        {/* Header Section */}
-        <Fade in={true} timeout={600}>
-          <Paper sx={styles.headerSection}>
-            <Hotel sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h4" sx={{ fontWeight: '600', mb: 1 }}>
-              Habitaciones Disponibles
-            </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
-              Explora nuestras habitaciones y encuentra la perfecta para ti
-            </Typography>
-          </Paper>
-        </Fade>
-
         {/* Error Alert */}
         {errorMessage && (
           <Fade in={true}>
@@ -223,7 +210,7 @@ const CuartosP = ({ idHotel }) => {
           </Fade>
         )}
 
-        {/* Rooms Grid - Centrado y más grande (3 columnas máximo) */}
+        {/* Rooms Grid - Mejor diseño y sin header */}
         <Grid container spacing={4} sx={styles.gridContainer}>
           {cuartos.map((cuarto, index) => {
             const primaryImage = cuarto.imagenhabitacion && cuarto.imagenhabitacion.data && cuarto.imagenhabitacion.mimeType
@@ -236,7 +223,22 @@ const CuartosP = ({ idHotel }) => {
               <Grid item xs={12} sm={6} md={4} key={cuarto.id}>
                 <Fade in={true} timeout={800 + index * 100}>
                   <Card
-                    sx={styles.roomCard}
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      borderRadius: '16px',
+                      background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%)',
+                      boxShadow: '0 4px 24px rgba(76, 148, 188, 0.07)',
+                      border: '1px solid #e0e6ed',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        transform: 'translateY(-6px) scale(1.02)',
+                        boxShadow: '0 12px 32px rgba(76, 148, 188, 0.15)',
+                        border: `1.5px solid ${colors.primary}`,
+                      },
+                    }}
                     onClick={() => handleCardClick(cuarto.id)}
                   >
                     {/* Image Section */}
@@ -249,10 +251,10 @@ const CuartosP = ({ idHotel }) => {
                           alt={`Imagen de ${cuarto.cuarto}`}
                           sx={{ 
                             objectFit: 'cover', 
-                            borderRadius: '12px 12px 0 0',
-                            transition: 'transform 0.2s ease',
+                            borderRadius: '16px 16px 0 0',
+                            transition: 'transform 0.2s',
                             '&:hover': {
-                              transform: 'scale(1.02)',
+                              transform: 'scale(1.03)',
                             }
                           }}
                         />
@@ -270,16 +272,15 @@ const CuartosP = ({ idHotel }) => {
                     )}
 
                     {/* Content Section */}
-                    <CardContent sx={styles.cardContent}>
+                    <CardContent sx={{ ...styles.cardContent, padding: '1.5rem' }}>
                       <Box>
-                        <Typography variant="h6" sx={styles.roomTitle}>
-                          <Hotel sx={{ mr: 1, fontSize: '1.4rem' }} />
+                        <Typography variant="h6" sx={{ ...styles.roomTitle, fontSize: '1.15rem', mb: 0.5 }}>
+                          <Hotel sx={{ mr: 1, fontSize: '1.3rem' }} />
                           Habitación {cuarto.cuarto}
                         </Typography>
-                        <Typography variant="body1" sx={styles.roomType}>
+                        <Typography variant="body1" sx={{ ...styles.roomType, fontWeight: 600, color: colors.primary, mb: 1 }}>
                           Tipo: {cuarto.tipohabitacion || 'No especificado'}
                         </Typography>
-
                         <Chip
                           icon={getStatusIcon(cuarto.estado)}
                           label={normalizedEstado || 'Sin estado'}
