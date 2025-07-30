@@ -50,7 +50,6 @@ const DetallesHabitacion = () => {
   const [reservation, setReservation] = useState({
     fechainicio: "",
     fechafin: "",
-    tipo_tarifa: "",
   });
   const [totalpagar, setTotalpagar] = useState(null);
   const [id_usuario, setIdUsuario] = useState(null);
@@ -275,7 +274,7 @@ const DetallesHabitacion = () => {
     const { name, value } = e.target;
     setReservation((prev) => {
       const newReservation = { ...prev, [name]: value };
-      if (name === "fechainicio" || name === "fechafin" || name === "tipo_tarifa") {
+      if (name === "fechainicio" || name === "fechafin") {
         validateAndCalculate(newReservation);
       }
       return newReservation;
@@ -283,8 +282,8 @@ const DetallesHabitacion = () => {
   };
 
   const validateAndCalculate = async (newReservation) => {
-  const { fechainicio, fechafin, tipo_tarifa } = newReservation;
-  if (!fechainicio || !fechafin || !tipo_tarifa) {
+  const { fechainicio, fechafin } = newReservation;
+  if (!fechainicio || !fechafin) {
     setTotalpagar(null);
     setError("");
     return;
@@ -306,51 +305,6 @@ const DetallesHabitacion = () => {
   const fechafinCST = endDateCST.format('YYYY-MM-DD HH:mm:ss');
   console.log(`Fechas en CST - Inicio: ${fechainicioCST}, Fin: ${fechafinCST}`);
 
-  // Calcular diferencias en CST
-  const diffHours = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'hours')));
-  const diffDays = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'days')));
-  const diffWeeks = Math.max(1, Math.ceil(endDateCST.diff(startDateCST, 'weeks')));
-  console.log(`Diferencias - Horas: ${diffHours}, Días: ${diffDays}, Semanas: ${diffWeeks}`);
-
-  let adjustedTarifa = tipo_tarifa;
-  let validationError = "";
-  switch (tipo_tarifa) {
-    case "hora":
-      if (diffHours > 24) {
-        adjustedTarifa = "dia";
-        validationError = "Tarifa por hora ajustada a 'Por Día' debido a más de 24 horas.";
-      }
-      break;
-    case "dia":
-      if (diffHours < 24) {
-        adjustedTarifa = "hora";
-        validationError = "Tarifa por día ajustada a 'Por Hora' debido a menos de 24 horas.";
-      }
-      break;
-    case "noche":
-      if (diffDays < 1) {
-        adjustedTarifa = "hora";
-        validationError = "Tarifa por noche ajustada a 'Por Hora' debido a menos de 1 día.";
-      }
-      break;
-    case "semana":
-      if (diffDays < 7) {
-        adjustedTarifa = "dia";
-        validationError = "Tarifa por semana ajustada a 'Por Día' debido a menos de 7 días.";
-      }
-      break;
-    default:
-      validationError = "Seleccione un tipo de tarifa válido.";
-  }
-
-  if (validationError) {
-    setReservation((prev) => ({ ...prev, tipo_tarifa: adjustedTarifa }));
-    setError(validationError);
-    console.log(`Tarifa ajustada a: ${adjustedTarifa}`);
-    validateAndCalculate({ ...newReservation, tipo_tarifa: adjustedTarifa });
-    return;
-  }
-
   try {
     const response = await axios.post(
       `https://backendreservas-m2zp.onrender.com/api/reservas/calculate-total`,
@@ -358,7 +312,7 @@ const DetallesHabitacion = () => {
         id_habitacion: parseInt(idHabitacion),
         fechainicio: fechainicioCST,
         fechafin: fechafinCST,
-        tipo_tarifa: adjustedTarifa,
+        tipo_tarifa: "dia", // Siempre usar tarifa por día
       },
       { headers: { "Content-Type": "application/json" } }
     );
@@ -380,8 +334,8 @@ const DetallesHabitacion = () => {
     return;
   }
 
-  const { fechainicio, fechafin, tipo_tarifa } = reservation;
-  if (!fechainicio || !fechafin || !tipo_tarifa || !totalpagar) {
+  const { fechainicio, fechafin } = reservation;
+  if (!fechainicio || !fechafin || !totalpagar) {
     setError("Por favor, complete todos los campos de reserva y calcule el total.");
     return;
   }
@@ -412,7 +366,7 @@ const DetallesHabitacion = () => {
       id_habitacion: parseInt(idHabitacion),
       fechainicio: fechainicioCST,
       fechafin: fechafinCST,
-      tipo_tarifa,
+      tipo_tarifa: "dia", // Siempre usar tarifa por día
       totalpagar,
     },
   });
@@ -762,20 +716,8 @@ const DetallesHabitacion = () => {
 
                   {[
                     {
-                      label: "Por Hora",
-                      price: habitacion?.preciohora,
-                    },
-                    {
                       label: "Por Día",
                       price: habitacion?.preciodia,
-                    },
-                    {
-                      label: "Por Noche",
-                      price: habitacion?.precionoche,
-                    },
-                    {
-                      label: "Por Semana",
-                      price: habitacion?.preciosemana,
                     },
                   ].map((item, index) => {
                     console.log(`Tarifa ${item.label}:`, {
@@ -885,22 +827,6 @@ const DetallesHabitacion = () => {
                 />
               </Box>
 
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Tipo de Tarifa</InputLabel>
-                <Select
-                  name="tipo_tarifa"
-                  value={reservation.tipo_tarifa}
-                  onChange={handleReservationChange}
-                  disabled={!isAvailable}
-                >
-                  <MenuItem value="">Seleccione una tarifa</MenuItem>
-                  <MenuItem value="hora">Por Hora</MenuItem>
-                  <MenuItem value="dia">Por Día</MenuItem>
-                  <MenuItem value="noche">Por Noche</MenuItem>
-                  <MenuItem value="semana">Por Semana</MenuItem>
-                </Select>
-              </FormControl>
-
               {totalpagar !== null && (
                 <Typography sx={styles.totalPrice}>
                   Total: ${totalpagar} MXN
@@ -911,7 +837,7 @@ const DetallesHabitacion = () => {
                 variant="contained"
                 fullWidth
                 onClick={handleReservation}
-                disabled={!isAvailable || !reservation.fechainicio || !reservation.fechafin || !reservation.tipo_tarifa || !totalpagar}
+                disabled={!isAvailable || !reservation.fechainicio || !reservation.fechafin || !totalpagar}
                 sx={styles.reserveButton}
               >
                 Reservar

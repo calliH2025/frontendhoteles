@@ -165,7 +165,11 @@ const CuartosP = ({ idHotel }) => {
       setErrorMessage('');
     } catch (error) {
       console.error('Error al obtener cuartos:', error);
-      setErrorMessage('Error al cargar los cuartos. Intente de nuevo.');
+      if (error.response?.status === 404) {
+        setErrorMessage('No hay habitaciones completas disponibles para este hotel.');
+      } else {
+        setErrorMessage('Error al cargar los cuartos. Intente de nuevo.');
+      }
     }
   };
 
@@ -318,10 +322,10 @@ const CuartosP = ({ idHotel }) => {
             <Box sx={styles.emptyState}>
               <Hotel sx={{ fontSize: 60, color: colors.neutral, mb: 2 }} />
               <Typography variant="h6" sx={{ color: colors.accent, fontWeight: '600', mb: 1 }}>
-                No hay habitaciones disponibles
+                No hay habitaciones completas disponibles
               </Typography>
               <Typography variant="body1" sx={{ color: '#6c757d' }}>
-                No se encontraron habitaciones para este hotel en este momento.
+                No se encontraron habitaciones completas para este hotel en este momento.
               </Typography>
             </Box>
           </Fade>

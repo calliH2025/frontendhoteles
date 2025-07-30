@@ -182,17 +182,11 @@ const API_BASE_URL = "https://backendreservas-m2zp.onrender.com"; // Cambia esto
 function Tipohabitacion() {
   const [tipoHabitacion, setTipoHabitacion] = useState({
     tipohabitacion: '',
-    precioHora: '',
-    precioDia: '',
-    precioNoche: '',
-    precioSemana: ''
+    precioDia: ''
   });
   const [errors, setErrors] = useState({
     tipohabitacion: '',
-    precioHora: '',
-    precioDia: '',
-    precioNoche: '',
-    precioSemana: ''
+    precioDia: ''
   });
   const [tipos, setTipos] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -264,12 +258,8 @@ function Tipohabitacion() {
     let error = "";
     if (name === "tipohabitacion") {
       error = validateTipoHabitacion(value);
-    } else {
-      const fieldName = name === "precioHora" ? "precio por hora" :
-                        name === "precioDia" ? "precio por día" :
-                        name === "precioNoche" ? "precio por noche" :
-                        "precio por semana";
-      error = validatePrice(value, fieldName);
+    } else if (name === "precioDia") {
+      error = validatePrice(value, "precio por día");
     }
 
     setErrors(prev => ({
@@ -284,10 +274,7 @@ function Tipohabitacion() {
     // Validar todos los campos antes de enviar
     const newErrors = {
       tipohabitacion: validateTipoHabitacion(tipoHabitacion.tipohabitacion),
-      precioHora: validatePrice(tipoHabitacion.precioHora, "precio por hora"),
-      precioDia: validatePrice(tipoHabitacion.precioDia, "precio por día"),
-      precioNoche: validatePrice(tipoHabitacion.precioNoche, "precio por noche"),
-      precioSemana: validatePrice(tipoHabitacion.precioSemana, "precio por semana")
+      precioDia: validatePrice(tipoHabitacion.precioDia, "precio por día")
     };
 
     setErrors(newErrors);
@@ -306,10 +293,7 @@ function Tipohabitacion() {
     try {
       const data = {
         tipohabitacion: tipoHabitacion.tipohabitacion,
-        precioHora: parseFloat(tipoHabitacion.precioHora),
-        precioDia: parseFloat(tipoHabitacion.precioDia),
-        precioNoche: parseFloat(tipoHabitacion.precioNoche),
-        precioSemana: parseFloat(tipoHabitacion.precioSemana)
+        precioDia: parseFloat(tipoHabitacion.precioDia)
       };
 
       const config = {
@@ -321,7 +305,7 @@ function Tipohabitacion() {
         MySwal.fire({
           icon: "success",
           title: "¡Perfecto!",
-          text: "Tipo de habitación actualizado correctamente.",
+          text: "Tipo de tarifa actualizado correctamente.",
           confirmButtonColor: "#4c94bc",
         });
       } else {
@@ -329,34 +313,28 @@ function Tipohabitacion() {
         MySwal.fire({
           icon: "success",
           title: "¡Excelente!",
-          text: "Tipo de habitación creado correctamente.",
+          text: "Tipo de tarifa creado correctamente.",
           confirmButtonColor: "#4c94bc",
         });
       }
 
       setTipoHabitacion({
         tipohabitacion: '',
-        precioHora: '',
-        precioDia: '',
-        precioNoche: '',
-        precioSemana: ''
+        precioDia: ''
       });
       setErrors({
         tipohabitacion: '',
-        precioHora: '',
-        precioDia: '',
-        precioNoche: '',
-        precioSemana: ''
+        precioDia: ''
       });
       setEditingId(null);
       setShowModal(false);
       fetchTipos();
     } catch (error) {
-      console.error('Error al guardar tipo de habitación:', error.message, error.response?.status, error.response?.data);
+      console.error('Error al guardar tipo de tarifa:', error.message, error.response?.status, error.response?.data);
       MySwal.fire({
         icon: "error",
         title: "Error",
-        text: `No se pudo guardar el tipo de habitación. Código: ${error.response?.status || 'Desconocido'}. Detalle: ${error.message}`,
+        text: `No se pudo guardar el tipo de tarifa. Código: ${error.response?.status || 'Desconocido'}. Detalle: ${error.message}`,
         confirmButtonColor: "#4c94bc",
       });
     }
@@ -383,15 +361,15 @@ function Tipohabitacion() {
         setTipos(tipos.filter(t => t.id_tipohabitacion !== id));
         MySwal.fire({
           title: '¡Eliminado!',
-          text: 'Tipo de habitación eliminado correctamente.',
+          text: 'Tipo de tarifa eliminado correctamente.',
           icon: 'success',
           confirmButtonColor: "#4c94bc",
         });
       } catch (error) {
-        console.error('Error al eliminar tipo de habitación:', error.message, error.response?.status, error.response?.data);
+        console.error('Error al eliminar tipo de tarifa:', error.message, error.response?.status, error.response?.data);
         MySwal.fire({
           title: 'Error!',
-          text: `Hubo un problema al intentar eliminar el tipo de habitación. Código: ${error.response?.status || 'Desconocido'}. Detalle: ${error.message}`,
+          text: `Hubo un problema al intentar eliminar el tipo de tarifa. Código: ${error.response?.status || 'Desconocido'}. Detalle: ${error.message}`,
           icon: 'error',
           confirmButtonColor: "#4c94bc",
         });
@@ -402,17 +380,11 @@ function Tipohabitacion() {
   const handleEdit = (tipo) => {
     setTipoHabitacion({
       tipohabitacion: tipo.tipohabitacion || '',
-      precioHora: tipo.precioHora ? tipo.precioHora.toString() : '',
-      precioDia: tipo.precioDia ? tipo.precioDia.toString() : '',
-      precioNoche: tipo.precioNoche ? tipo.precioNoche.toString() : '',
-      precioSemana: tipo.precioSemana ? tipo.precioSemana.toString() : ''
+      precioDia: tipo.precioDia ? tipo.precioDia.toString() : ''
     });
     setErrors({
       tipohabitacion: '',
-      precioHora: '',
-      precioDia: '',
-      precioNoche: '',
-      precioSemana: ''
+      precioDia: ''
     });
     setEditingId(tipo.id_tipohabitacion);
     setShowModal(true);
@@ -421,17 +393,11 @@ function Tipohabitacion() {
   const handleCancel = () => {
     setTipoHabitacion({
       tipohabitacion: '',
-      precioHora: '',
-      precioDia: '',
-      precioNoche: '',
-      precioSemana: ''
+      precioDia: ''
     });
     setErrors({
       tipohabitacion: '',
-      precioHora: '',
-      precioDia: '',
-      precioNoche: '',
-      precioSemana: ''
+      precioDia: ''
     });
     setEditingId(null);
     setShowModal(false);
@@ -440,17 +406,11 @@ function Tipohabitacion() {
   const handleAddNew = () => {
     setTipoHabitacion({
       tipohabitacion: '',
-      precioHora: '',
-      precioDia: '',
-      precioNoche: '',
-      precioSemana: ''
+      precioDia: ''
     });
     setErrors({
       tipohabitacion: '',
-      precioHora: '',
-      precioDia: '',
-      precioNoche: '',
-      precioSemana: ''
+      precioDia: ''
     });
     setEditingId(null);
     setShowModal(true);
@@ -466,15 +426,9 @@ function Tipohabitacion() {
   const isFormValid = () => {
     return (
       tipoHabitacion.tipohabitacion &&
-      tipoHabitacion.precioHora &&
       tipoHabitacion.precioDia &&
-      tipoHabitacion.precioNoche &&
-      tipoHabitacion.precioSemana &&
       !errors.tipohabitacion &&
-      !errors.precioHora &&
-      !errors.precioDia &&
-      !errors.precioNoche &&
-      !errors.precioSemana
+      !errors.precioDia
     );
   };
 
@@ -500,10 +454,10 @@ function Tipohabitacion() {
                 fontWeight: 800,
               }}
             >
-              Gestión de Tipos de Habitaciones
+              Gestión de Tipos de Tarifas
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-              Administra los tipos de habitaciones y sus precios de manera eficiente
+              Administra los tipos de Tarifas y sus precios de manera eficiente
             </Typography>
           </Box>
 
@@ -527,10 +481,10 @@ function Tipohabitacion() {
             }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-                  Tipos de Habitación
+                  Tipos de Tarifas
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  {tipos.length} habitaciones registradas
+                  {tipos.length} tarifas registradas
                 </Typography>
               </Box>
               <Button
@@ -554,7 +508,7 @@ function Tipohabitacion() {
                   },
                 }}
               >
-                Nueva Habitación
+                Nueva Tarifa
               </Button>
             </Box>
 
@@ -562,11 +516,8 @@ function Tipohabitacion() {
               <Table sx={{ minWidth: 650 }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tipo de Habitación</TableCell>
-                    <TableCell align="center">Precio Hora</TableCell>
-                    <TableCell align="center">Precio Día</TableCell>
-                    <TableCell align="center">Precio Noche</TableCell>
-                    <TableCell align="center">Precio Semana</TableCell>
+                    <TableCell>Tipo de Tarifa</TableCell>
+                    <TableCell align="center">Precio por Día</TableCell>
                     <TableCell align="center">Estado</TableCell>
                     <TableCell align="center">Acciones</TableCell>
                   </TableRow>
@@ -593,22 +544,7 @@ function Tipohabitacion() {
                       </TableCell>
                       <TableCell align="center">
                         <Typography variant="body2" sx={{ color: '#4c94bc', fontWeight: 600 }}>
-                          {formatPrice(tipo.precioHora)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2" sx={{ color: '#4c94bc', fontWeight: 600 }}>
                           {formatPrice(tipo.precioDia)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2" sx={{ color: '#4c94bc', fontWeight: 600 }}>
-                          {formatPrice(tipo.precioNoche)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2" sx={{ color: '#4c94bc', fontWeight: 600 }}>
-                          {formatPrice(tipo.precioSemana)}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
@@ -688,7 +624,7 @@ function Tipohabitacion() {
                 }}>
                   <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                      {editingId ? 'Editar Habitación' : 'Nueva Habitación'}
+                      {editingId ? 'Editar Tarifa' : 'Nueva Tarifa'}
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.9 }}>
                       {editingId ? 'Actualiza la información' : 'Completa todos los campos'}
@@ -714,7 +650,7 @@ function Tipohabitacion() {
                     <Box sx={{ display: 'grid', gap: 3 }}>
                       <TextField
                         fullWidth
-                        label="Nombre del Tipo de Habitación"
+                        label="Nombre del Tipo de Tarifa"
                         name="tipohabitacion"
                         value={tipoHabitacion.tipohabitacion}
                         onChange={handleChange}
@@ -724,83 +660,22 @@ function Tipohabitacion() {
                         helperText={errors.tipohabitacion}
                       />
                       
-                      <Box sx={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
-                        gap: 2 
-                      }}>
-                        <TextField
-                          fullWidth
-                          label="Precio por Hora"
-                          name="precioHora"
-                          type="number"
-                          value={tipoHabitacion.precioHora}
-                          onChange={handleChange}
-                          required
-                          placeholder="0.00"
-                          InputProps={{
-                            startAdornment: <Typography sx={{ mr: 1, color: '#4c94bc', fontWeight: 600 }}>$</Typography>,
-                            inputProps: { min: 0, step: "0.01" }
-                          }}
-                          error={!!errors.precioHora}
-                          helperText={errors.precioHora}
-                        />
-                        <TextField
-                          fullWidth
-                          label="Precio por Día"
-                          name="precioDia"
-                          type="number"
-                          value={tipoHabitacion.precioDia}
-                          onChange={handleChange}
-                          required
-                          placeholder="0.00"
-                          InputProps={{
-                            startAdornment: <Typography sx={{ mr: 1, color: '#4c94bc', fontWeight: 600 }}>$</Typography>,
-                            inputProps: { min: 0, step: "0.01" }
-                          }}
-                          error={!!errors.precioDia}
-                          helperText={errors.precioDia}
-                        />
-                      </Box>
-
-                      <Box sx={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
-                        gap: 2 
-                      }}>
-                        <TextField
-                          fullWidth
-                          label="Precio por Noche"
-                          name="precioNoche"
-                          type="number"
-                          value={tipoHabitacion.precioNoche}
-                          onChange={handleChange}
-                          required
-                          placeholder="0.00"
-                          InputProps={{
-                            startAdornment: <Typography sx={{ mr: 1, color: '#4c94bc', fontWeight: 600 }}>$</Typography>,
-                            inputProps: { min: 0, step: "0.01" }
-                          }}
-                          error={!!errors.precioNoche}
-                          helperText={errors.precioNoche}
-                        />
-                        <TextField
-                          fullWidth
-                          label="Precio por Semana"
-                          name="precioSemana"
-                          type="number"
-                          value={tipoHabitacion.precioSemana}
-                          onChange={handleChange}
-                          required
-                          placeholder="0.00"
-                          InputProps={{
-                            startAdornment: <Typography sx={{ mr: 1, color: '#4c94bc', fontWeight: 600 }}>$</Typography>,
-                            inputProps: { min: 0, step: "0.01" }
-                          }}
-                          error={!!errors.precioSemana}
-                          helperText={errors.precioSemana}
-                        />
-                      </Box>
+                      <TextField
+                        fullWidth
+                        label="Precio por Día"
+                        name="precioDia"
+                        type="number"
+                        value={tipoHabitacion.precioDia}
+                        onChange={handleChange}
+                        required
+                        placeholder="0.00"
+                        InputProps={{
+                          startAdornment: <Typography sx={{ mr: 1, color: '#4c94bc', fontWeight: 600 }}>$</Typography>,
+                          inputProps: { min: 0, step: "0.01" }
+                        }}
+                        error={!!errors.precioDia}
+                        helperText={errors.precioDia}
+                      />
                     </Box>
 
                     <Box sx={{ 
@@ -838,7 +713,7 @@ function Tipohabitacion() {
                           minWidth: 120,
                         }}
                       >
-                        {editingId ? 'Actualizar' : 'Crear Habitación'}
+                        {editingId ? 'Actualizar' : 'Crear Tarifa'}
                       </Button>
                     </Box>
                   </form>

@@ -1,232 +1,274 @@
+import { Card, CardContent, Button, Typography, Grid, Box, Chip, Paper, Container } from "@mui/material"
 import {
-  Box,
-  Button,
-  Container,
-  Typography,
-  Grid,
-  Fade,
-  Slide,
-  Paper,
-  Card,
-  CardContent,
-  CardMedia,
-  Divider,
-  IconButton,
-} from "@mui/material";
-import { Business, EventSeat, PieChart, ArrowForward, Star } from "@mui/icons-material";
-import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
-import { motion } from "framer-motion";
+  Person as PersonIcon,
+  LocalOffer as TagIcon,
+  CalendarToday as CalendarIcon,
+  BarChart as BarChartIcon,
+  Business as BuildingIcon,
+  AttachMoney as DollarIcon,
+  CreditCard as CreditCardIcon,
+  ArrowForward as ArrowForwardIcon,
+} from "@mui/icons-material"
 
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#f59e0b", // Amber
-      light: "#fde68a",
-      dark: "#c77e0b",
+export default function Propietario() {
+  const menuItems = [
+    {
+      title: "Perfil",
+      description: "Gestiona tu información personal y configuración de cuenta",
+      icon: PersonIcon,
+      color: "#1976d2",
+      gradient: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
     },
-    secondary: {
-      main: "#6b7280", // Slate
-      light: "#d1d5db",
-      dark: "#4b5563",
+    {
+      title: "Promociones",
+      description: "Crea y administra ofertas especiales para tus propiedades",
+      icon: TagIcon,
+      color: "#388e3c",
+      gradient: "linear-gradient(135deg, #388e3c 0%, #2e7d32 100%)",
     },
-    background: {
-      default: "#f5f7fa", // Very light gradient base
-      paper: "#ffffff",
+    {
+      title: "Gestión Reservas",
+      description: "Administra todas las reservas y disponibilidad de tus hoteles",
+      icon: CalendarIcon,
+      color: "#7b1fa2",
+      gradient: "linear-gradient(135deg, #7b1fa2 0%, #6a1b9a 100%)",
     },
-    text: {
-      primary: "#1e293b",
-      secondary: "#475569",
+    {
+      title: "Reportes",
+      description: "Analiza el rendimiento y estadísticas de tus propiedades",
+      icon: BarChartIcon,
+      color: "#f57c00",
+      gradient: "linear-gradient(135deg, #f57c00 0%, #ef6c00 100%)",
     },
-  },
-  typography: {
-    fontFamily: "'Poppins', sans-serif",
-    h1: {
-      fontWeight: 800,
-      fontSize: "3.5rem",
-      letterSpacing: "-0.5px",
+    {
+      title: "Hoteles",
+      description: "Administra la información y servicios de tus hoteles",
+      icon: BuildingIcon,
+      color: "#303f9f",
+      gradient: "linear-gradient(135deg, #303f9f 0%, #283593 100%)",
     },
-    h2: {
-      fontWeight: 700,
-      fontSize: "2.25rem",
-      color: "#f59e0b",
+    {
+      title: "Tarifas",
+      description: "Configura precios y tarifas para diferentes temporadas",
+      icon: DollarIcon,
+      color: "#00796b",
+      gradient: "linear-gradient(135deg, #00796b 0%, #00695c 100%)",
     },
-    h3: {
-      fontWeight: 600,
-      fontSize: "1.5rem",
-      color: "#6b7280",
+    {
+      title: "Conexión Mercado Pago",
+      description: "Integra y configura pagos con Mercado Pago",
+      icon: CreditCardIcon,
+      color: "#0097a7",
+      gradient: "linear-gradient(135deg, #0097a7 0%, #00838f 100%)",
     },
-    body1: {
-      fontSize: "1.1rem",
-      lineHeight: 1.6,
-    },
-    button: {
-      textTransform: "none",
-      fontWeight: 600,
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          transition: "all 0.3s ease-in-out",
-          "&:hover": {
-            boxShadow: "0 12px 24px rgba(0, 0, 0, 0.12)",
-          },
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "8px 16px",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          },
-        },
-      },
-    },
-  },
-});
+  ]
 
-const MotionCard = motion(Card);
-
-const PaginaPrincipalPropietario = () => {
-  const muiTheme = useTheme();
+  const stats = [
+    { value: "24", label: "Reservas Activas", color: "#1976d2" },
+    { value: "$45,280", label: "Ingresos del Mes", color: "#388e3c" },
+    { value: "89%", label: "Ocupación Promedio", color: "#7b1fa2" },
+    { value: "4.8", label: "Calificación Promedio", color: "#f57c00" },
+  ]
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #f9fafb 0%, #e0e7ff 100%)",
-          color: muiTheme.palette.text.primary,
-          py: { xs: 4, sm: 6, md: 10 },
-          px: { xs: 1, sm: 2, md: 0 },
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Subtle background decoration */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "-10%",
-            left: "-10%",
-            width: "120%",
-            height: "120%",
-            background: "radial-gradient(circle, rgba(245, 158, 11, 0.05) 0%, transparent 70%)",
-            zIndex: 0,
-          }}
-        />
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, px: { xs: 1, sm: 2, md: 0 } }}>
-          <Fade in timeout={1500}>
-            <Box sx={{ textAlign: "center", mb: { xs: 5, md: 10 } }}>
-              <Typography variant="h1" gutterBottom sx={{ textShadow: "1px 1px 4px rgba(0, 0, 0, 0.1)", fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" } }}>
-                Panel del Propietario
-              </Typography>
-              <Typography
-                variant="body1"
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        py: 4,
+        px: 2,
+      }}
+    >
+      <Container maxWidth="xl">
+        {/* Header Section */}
+        <Box textAlign="center" mb={6}>
+          <Typography
+            variant="h2"
+            component="h1"
+            fontWeight="bold"
+            color="text.primary"
+            mb={2}
+            sx={{
+              fontSize: { xs: "2.5rem", md: "3.5rem" },
+              background: "linear-gradient(45deg, #1976d2, #7b1fa2)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Portal del Propietario
+          </Typography>
+          <Typography variant="h6" color="text.secondary" mb={3} sx={{ maxWidth: "600px", mx: "auto" }}>
+            Gestiona todos los aspectos de tu negocio hotelero desde un solo lugar
+          </Typography>
+          <Chip label="Dashboard Principal" color="primary" variant="outlined" sx={{ fontWeight: "medium" }} />
+        </Box>
+
+        {/* Menu Cards Grid */}
+        <Grid container spacing={3} mb={6}>
+          {menuItems.map((item, index) => {
+            const IconComponent = item.icon
+            return (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease-in-out",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: "0 12px 24px rgba(0,0,0,0.15)",
+                    },
+                    borderRadius: 3,
+                    overflow: "hidden",
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "center", p: 3 }}>
+                    <Box
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: "50%",
+                        background: item.gradient,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mx: "auto",
+                        mb: 2,
+                        transition: "transform 0.3s ease",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                        },
+                      }}
+                    >
+                      <IconComponent sx={{ fontSize: 32, color: "white" }} />
+                    </Box>
+
+                    <Typography variant="h6" component="h3" fontWeight="bold" mb={1} color="text.primary">
+                      {item.title}
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      mb={3}
+                      sx={{ minHeight: "48px", lineHeight: 1.4 }}
+                    >
+                      {item.description}
+                    </Typography>
+
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      endIcon={<ArrowForwardIcon />}
+                      sx={{
+                        background: item.gradient,
+                        "&:hover": {
+                          background: item.gradient,
+                          opacity: 0.9,
+                          transform: "scale(1.02)",
+                        },
+                        borderRadius: 2,
+                        py: 1,
+                        fontWeight: "medium",
+                      }}
+                    >
+                      Acceder
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )
+          })}
+        </Grid>
+
+        {/* Quick Stats */}
+        <Grid container spacing={3} mb={4}>
+          {stats.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Paper
+                elevation={2}
                 sx={{
-                  maxWidth: "700px",
-                  mx: "auto",
-                  color: muiTheme.palette.text.secondary,
-                  fontWeight: 500,
-                  mb: { xs: 3, md: 4 },
-                  fontSize: { xs: "1rem", sm: "1.1rem" },
+                  p: 3,
+                  textAlign: "center",
+                  borderRadius: 3,
+                  background: "rgba(255, 255, 255, 0.9)",
+                  backdropFilter: "blur(10px)",
+                  transition: "transform 0.2s ease",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                  },
                 }}
               >
-                Toma el control total de tus propiedades, gestiona reservas y descubre insights valiosos con un diseño elegante y funcional.
-              </Typography>
+                <Typography variant="h4" component="div" fontWeight="bold" sx={{ color: stat.color, mb: 1 }}>
+                  {stat.value}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {stat.label}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Welcome Message */}
+        <Card
+          sx={{
+            background: "linear-gradient(135deg, #1976d2 0%, #7b1fa2 100%)",
+            color: "white",
+            borderRadius: 3,
+          }}
+        >
+          <CardContent sx={{ p: 4, textAlign: "center" }}>
+            <Typography variant="h4" component="h2" fontWeight="bold" mb={2}>
+              ¡Bienvenido de vuelta!
+            </Typography>
+            <Typography variant="body1" sx={{ opacity: 0.9, mb: 3, maxWidth: "600px", mx: "auto" }}>
+              Tienes 3 nuevas reservas pendientes de confirmación y 2 promociones por vencer esta semana.
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 2,
+                justifyContent: "center",
+              }}
+            >
               <Button
                 variant="contained"
-                color="primary"
                 size="large"
-                sx={{ px: { xs: 2, sm: 4 }, py: { xs: 1, sm: 1.5 }, borderRadius: 12, fontSize: { xs: "1rem", sm: "1.1rem" } }}
+                sx={{
+                  bgcolor: "rgba(255, 255, 255, 0.2)",
+                  color: "white",
+                  "&:hover": {
+                    bgcolor: "rgba(255, 255, 255, 0.3)",
+                  },
+                  borderRadius: 2,
+                  px: 3,
+                }}
               >
-                ¡Explora Ahora!
+                Ver Reservas Pendientes
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                sx={{
+                  borderColor: "rgba(255, 255, 255, 0.5)",
+                  color: "white",
+                  "&:hover": {
+                    borderColor: "white",
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                  },
+                  borderRadius: 2,
+                  px: 3,
+                }}
+              >
+                Gestionar Promociones
               </Button>
             </Box>
-          </Fade>
-
-          <Slide in timeout={1500} direction="up">
-            <Grid container spacing={{ xs: 3, sm: 4, md: 6 }}>
-              {[
-                { title: "Gestionar Propiedades", desc: "Actualiza y supervisa tus hoteles con facilidad.", icon: Business },
-                { title: "Controlar Reservas", desc: "Revisa y administra las reservas de tus alojamientos.", icon: EventSeat },
-                { title: "Analizar Reportes", desc: "Explora estadísticas financieras detalladas y personalizadas.", icon: PieChart },
-              ].map((item, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <MotionCard
-                    whileHover={{ scale: 1.08 }}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 }}
-                    elevation={6}
-                    sx={{
-                      borderRadius: 16,
-                      background: "linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)",
-                      overflow: "hidden",
-                      position: "relative",
-                      minHeight: { xs: 260, sm: 300 },
-                    }}
-                  >
-                    <CardMedia
-                      component="div"
-                      sx={{
-                        height: { xs: 80, sm: 120 },
-                        background: `linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(107, 114, 128, 0.05) 100%)`,
-                      }}
-                    />
-                    <CardContent sx={{ p: { xs: 2, sm: 4 }, textAlign: "center" }}>
-                      <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
-                        <item.icon sx={{ fontSize: { xs: "2.2rem", sm: "3rem" }, color: index === 2 ? muiTheme.palette.secondary.main : muiTheme.palette.primary.main }} />
-                        {index === 0 && (
-                          <IconButton sx={{ position: "absolute", top: 10, right: 10 }}>
-                            <Star color="primary" />
-                          </IconButton>
-                        )}
-                      </Box>
-                      <Typography variant="h2" gutterBottom sx={{ fontSize: { xs: "1.3rem", sm: "2.25rem" } }}>
-                        {item.title}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary" sx={{ mb: { xs: 2, sm: 4 }, fontSize: { xs: "1rem", sm: "1.1rem" } }}>
-                        {item.desc}
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        color={index === 2 ? "secondary" : "primary"}
-                        endIcon={<ArrowForward />}
-                        sx={{ mt: 2, px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.5 }, borderRadius: 12, fontSize: { xs: "0.95rem", sm: "1.05rem" } }}
-                      >
-                        {item.title}
-                      </Button>
-                    </CardContent>
-                  </MotionCard>
-                </Grid>
-              ))}
-            </Grid>
-          </Slide>
-
-          <Divider sx={{ my: { xs: 4, sm: 6, md: 8 }, borderColor: "rgba(107, 114, 128, 0.2)" }} />
-
-          <Fade in timeout={1500}>
-            <Box sx={{ textAlign: "center", mb: { xs: 3, sm: 6 } }}>
-              <Typography variant="h3" gutterBottom sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}>
-                Tu éxito comienza aquí
-              </Typography>
-              <Typography variant="body1" sx={{ maxWidth: "600px", mx: "auto", color: muiTheme.palette.text.secondary, mb: { xs: 2, sm: 4 }, fontSize: { xs: "1rem", sm: "1.1rem" } }}>
-                Con herramientas modernas y un diseño intuitivo, optimiza la gestión de tus propiedades hoy mismo.
-              </Typography>
-            </Box>
-          </Fade>
-        </Container>
-      </Box>
-    </ThemeProvider>
-  );
-};
-
-export default PaginaPrincipalPropietario;
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
+  )
+}

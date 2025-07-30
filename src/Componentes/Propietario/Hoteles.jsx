@@ -27,7 +27,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
+
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BedIcon from '@mui/icons-material/Bed';
 import Tooltip from '@mui/material/Tooltip';
@@ -54,9 +54,10 @@ const serviciosDisponibles = [
   'Cocina',
   'Alberca',
   'Lavanderia',
-  'Restaurant',
+  'Restaurante',
   'Internet',
   'Agua Caliente',
+  'Otros',
 ];
 
 const API_BASE_URL = 'https://backendreservas-m2zp.onrender.com';
@@ -137,7 +138,7 @@ const Hoteles = () => {
   const [formData, setFormData] = useState({
     nombrehotel: '',
     direccion: '',
-    telefono: '',
+    telefono: '+52 ',
     correo: '',
     numhabitacion: '',
     descripcion: '',
@@ -146,7 +147,6 @@ const Hoteles = () => {
     removeImage: false,
     latitud: '',
     longitud: '',
-    ubicacionTexto: '',
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -156,6 +156,8 @@ const Hoteles = () => {
   const [validationErrors, setValidationErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [mapCenter, setMapCenter] = useState([21.1399, -98.4194]); // Centro inicial en Huejutla
+  const [customServices, setCustomServices] = useState('');
+  const [showCustomServicesInput, setShowCustomServicesInput] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -166,26 +168,54 @@ const Hoteles = () => {
 
     setupAxiosInterceptors(navigate);
     fetchHoteles();
+    fetchUserData(); // Obtener datos del usuario para el correo por defecto
   }, [navigate]);
 
   const fetchHoteles = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/hoteles`);
-      if (!Array.isArray(response.data)) {
-        throw new Error('La respuesta de la API no es un arreglo');
+      
+      // Manejar la nueva estructura de respuesta
+      let hotelesData = [];
+      if (response.data.hoteles && Array.isArray(response.data.hoteles)) {
+        hotelesData = response.data.hoteles.map((hotel) => ({
+          ...hotel,
+          id: hotel.id_hotel,
+          imagen: hotel.imagen ? JSON.parse(hotel.imagen) : null,
+          telefono: hotel.telefono || '',
+          servicios: hotel.servicios ? hotel.servicios.split(',') : [], // Convertir string a array
+        }));
+      } else if (Array.isArray(response.data)) {
+        // Fallback para la estructura anterior
+        hotelesData = response.data.map((hotel) => ({
+          ...hotel,
+          id: hotel.id_hotel,
+          imagen: hotel.imagen ? JSON.parse(hotel.imagen) : null,
+          telefono: hotel.telefono || '',
+          servicios: hotel.servicios ? hotel.servicios.split(',') : [], // Convertir string a array
+        }));
+      } else {
+        throw new Error('La respuesta de la API no es válida');
       }
-      const hotelesData = response.data.map((hotel) => ({
-        ...hotel,
-        id: hotel.id_hotel,
-        imagen: hotel.imagen ? JSON.parse(hotel.imagen) : null,
-        telefono: hotel.telefono || '',
-        servicios: hotel.servicios ? hotel.servicios.split(',') : [], // Convertir string a array
-      }));
+      
       setHoteles(hotelesData);
       setErrorMessage('');
     } catch (error) {
       console.error('Error al obtener hoteles:', error.response?.data || error.message);
       setErrorMessage(error.response?.data?.error || 'Error al cargar los hoteles. Intente de nuevo.');
+    }
+  };
+
+  // Función para obtener datos del usuario autenticado
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/perfilusuario`);
+      setFormData(prev => ({
+        ...prev,
+        correo: response.data.Correo
+      }));
+    } catch (error) {
+      console.error('Error al obtener datos del usuario:', error);
     }
   };
 
@@ -202,7 +232,19 @@ const Hoteles = () => {
       if (response.data.length > 0) {
         const { lat, lon } = response.data[0];
         setMapCenter([parseFloat(lat), parseFloat(lon)]);
+        // Actualizar latitud y longitud automáticamente
+        setFormData((prev) => ({
+          ...prev,
+          latitud: lat.toString(),
+          longitud: lon.toString(),
+        }));
         setLocationError('');
+        // Limpiar errores de validación de lat/lng
+        setValidationErrors((prev) => ({
+          ...prev,
+          latitud: '',
+          longitud: '',
+        }));
       } else {
         setLocationError('No se encontró la ubicación. Intente con un nombre más específico.');
       }
@@ -221,7 +263,12 @@ const Hoteles = () => {
         else if (value.trim().length > 100) error = 'El nombre no puede exceder 100 caracteres';
         break;
       case 'telefono':
-        if (value && !/^\d{10}$/.test(value)) error = 'El teléfono debe contener exactamente 10 dígitos';
+        if (value) {
+          // Extraer solo los dígitos del usuario, ignorando el prefijo +52
+          const rawDigits = value.replace(/\D/g, '');
+          const userDigits = rawDigits.startsWith('52') ? rawDigits.substring(2) : rawDigits;
+          if (userDigits.length !== 10) error = 'El teléfono debe contener exactamente 10 dígitos';
+        }
         break;
       case 'correo':
         if (!value.trim()) error = 'El correo electrónico es obligatorio';
@@ -258,7 +305,7 @@ const Hoteles = () => {
   const validateAllFields = () => {
     const errors = {};
     Object.keys(formData).forEach((key) => {
-      if (key !== 'imagen' && key !== 'removeImage' && key !== 'ubicacionTexto') {
+      if (key !== 'imagen' && key !== 'removeImage') {
         const error = validateField(key, formData[key]);
         if (error) errors[key] = error;
       }
@@ -266,80 +313,70 @@ const Hoteles = () => {
     return errors;
   };
 
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setFormData((prev) => ({
-            ...prev,
-            latitud: latitude.toString(),
-            longitud: longitude.toString(),
-          }));
-          setMapCenter([latitude, longitude]);
-          setLocationError('');
-          setValidationErrors((prev) => ({
-            ...prev,
-            latitud: '',
-            longitud: '',
-          }));
-        },
-        (error) => {
-          console.error('Error al obtener la ubicación:', error);
-          let errorMsg = 'No se pudo obtener la ubicación. ';
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMsg += 'Permiso denegado por el usuario.';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMsg += 'La ubicación no está disponible.';
-              break;
-            case error.TIMEOUT:
-              errorMsg += 'Se agotó el tiempo para obtener la ubicación.';
-              break;
-            default:
-              errorMsg += 'Ocurrió un error desconocido.';
-              break;
-          }
-          setLocationError(errorMsg);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
-        }
-      );
-    } else {
-      setLocationError('La geolocalización no es compatible con este navegador.');
-    }
-  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'telefono') {
-      const numericValue = value.replace(/\D/g, '');
-      if (numericValue.length <= 10) {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: numericValue,
-        }));
+      // Extraer solo los dígitos que el usuario está tecleando, ignorando el prefijo +52
+      // Primero, obtener todos los dígitos de la cadena actual
+      const rawDigits = value.replace(/\D/g, '');
+      
+      // Si la cadena de dígitos comienza con '52' (del prefijo), removerla para obtener solo los dígitos del usuario
+      // De lo contrario, usar todos los dígitos (esto cubre el caso inicial o si el usuario borra el prefijo)
+      const userDigits = rawDigits.startsWith('52') ? rawDigits.substring(2) : rawDigits;
+      
+      // Limitar a un máximo de 10 dígitos para el número de teléfono
+      const limitedUserDigits = userDigits.slice(0, 10);
+      
+      // Construir el valor formateado con el prefijo fijo
+      let formattedValue = '+52 ';
+      
+      if (limitedUserDigits.length >= 1) {
+        formattedValue += limitedUserDigits.slice(0, 2);
       }
-    } else if (name === 'ubicacionTexto') {
+      if (limitedUserDigits.length >= 3) {
+        formattedValue += ` ${limitedUserDigits.slice(2, 4)}`;
+      }
+      if (limitedUserDigits.length >= 5) {
+        formattedValue += ` ${limitedUserDigits.slice(4, 8)}`;
+      }
+      if (limitedUserDigits.length >= 9) {
+        formattedValue += ` ${limitedUserDigits.slice(8)}`;
+      }
+      
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formattedValue,
+      }));
+    } else if (name === 'direccion') {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
+      // Geocodificar automáticamente cuando se escribe la dirección
       if (value.trim()) {
         geocodeLocation(value);
       } else {
         setMapCenter([21.1399, -98.4194]); // Restablecer al centro de Huejutla
         setLocationError('');
       }
+
     } else if (name === 'servicios') {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
+      
+      // Verificar si "Otros" está seleccionado
+      const hasOtros = value.includes('Otros');
+      setShowCustomServicesInput(hasOtros);
+      
+      // Si se deselecciona "Otros", limpiar servicios personalizados
+      if (!hasOtros) {
+        setCustomServices('');
+      }
+      
       setTouched((prev) => ({
         ...prev,
         [name]: true,
@@ -372,6 +409,10 @@ const Hoteles = () => {
       ...prev,
       [name]: true,
     }));
+  };
+
+  const handleCustomServicesChange = (e) => {
+    setCustomServices(e.target.value);
   };
 
   const handleImageChange = (e) => {
@@ -435,7 +476,15 @@ const Hoteles = () => {
     formDataToSend.append('correo', formData.correo);
     formDataToSend.append('numhabitacion', formData.numhabitacion);
     formDataToSend.append('descripcion', formData.descripcion);
-    formDataToSend.append('servicios', formData.servicios.join(',')); // Convertir array a string
+    // Procesar servicios incluyendo los personalizados
+    let serviciosFinales = [...formData.servicios];
+    if (showCustomServicesInput && customServices.trim()) {
+      // Remover "Otros" de la lista y agregar los servicios personalizados
+      serviciosFinales = serviciosFinales.filter(servicio => servicio !== 'Otros');
+      const serviciosPersonalizados = customServices.split(',').map(s => s.trim()).filter(s => s);
+      serviciosFinales.push(...serviciosPersonalizados);
+    }
+    formDataToSend.append('servicios', serviciosFinales.join(',')); // Convertir array a string
     formDataToSend.append('removeImage', formData.removeImage);
     if (formData.imagen instanceof File) {
       formDataToSend.append('imagen', formData.imagen);
@@ -479,20 +528,35 @@ const Hoteles = () => {
   };
 
   const handleEdit = (hotel) => {
+    // Separar servicios predefinidos de servicios personalizados
+    const serviciosPredefinidos = serviciosDisponibles.filter(servicio => 
+      hotel.servicios && hotel.servicios.includes(servicio)
+    );
+    
+    // Si hay servicios que no están en la lista predefinida, agregar "Otros" y ponerlos en customServices
+    const serviciosPersonalizados = hotel.servicios ? 
+      hotel.servicios.filter(servicio => !serviciosDisponibles.includes(servicio)) : [];
+    
+    const serviciosFinales = serviciosPersonalizados.length > 0 ? 
+      [...serviciosPredefinidos, 'Otros'] : serviciosPredefinidos;
+    
     setFormData({
       nombrehotel: hotel.nombrehotel || '',
       direccion: hotel.direccion || '',
-      telefono: hotel.telefono || '',
+      telefono: hotel.telefono ? (hotel.telefono.startsWith('+52') ? hotel.telefono : `+52 ${hotel.telefono.replace(/\D/g, '')}`) : '+52 ',
       correo: hotel.correo || '',
       numhabitacion: hotel.numhabitacion || '',
       descripcion: hotel.descripcion || '',
-      servicios: hotel.servicios || [],
+      servicios: serviciosFinales,
       imagen: null,
       removeImage: false,
       latitud: hotel.latitud?.toString() || '',
       longitud: hotel.longitud?.toString() || '',
-      ubicacionTexto: '',
     });
+    
+    setCustomServices(serviciosPersonalizados.join(', '));
+    setShowCustomServicesInput(serviciosPersonalizados.length > 0);
+    
     setImagePreview(hotel.imagen && hotel.imagen?.data ? `data:${hotel.imagen.mimeType};base64,${hotel.imagen.data}` : null);
     setMapCenter([parseFloat(hotel.latitud) || 21.1399, parseFloat(hotel.longitud) || -98.4194]);
     setEditingId(hotel.id_hotel);
@@ -505,7 +569,7 @@ const Hoteles = () => {
     setFormData({
       nombrehotel: '',
       direccion: '',
-      telefono: '',
+      telefono: '+52 ',
       correo: '',
       numhabitacion: '',
       descripcion: '',
@@ -514,7 +578,6 @@ const Hoteles = () => {
       removeImage: false,
       latitud: '',
       longitud: '',
-      ubicacionTexto: '',
     });
     setImagePreview(null);
     setEditingId(null);
@@ -524,6 +587,8 @@ const Hoteles = () => {
     setTouched({});
     setErrorMessage('');
     setMapCenter([21.1399, -98.4194]);
+    setCustomServices('');
+    setShowCustomServicesInput(false);
   };
 
   // Configuración del mapa centrado en Huejutla
@@ -616,32 +681,34 @@ const Hoteles = () => {
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
             {[
               { label: 'Nombre del Hotel', name: 'nombrehotel', type: 'text', required: true },
-              { label: 'Dirección', name: 'direccion', type: 'text', required: false },
+              { label: 'Dirección', name: 'direccion', type: 'text', required: false, helperText: 'Al escribir la dirección se obtienen automáticamente las coordenadas' },
               {
                 label: 'Teléfono',
                 name: 'telefono',
                 type: 'text',
                 required: false,
-                placeholder: '1234567890',
+                placeholder: '+52 55 1234 5678',
+                helperText: 'El prefijo +52 es fijo. Ingresa solo los 10 dígitos del número',
               },
-              { label: 'Correo Electrónico', name: 'correo', type: 'email', required: true },
+              { label: 'Correo Electrónico', name: 'correo', type: 'email', required: true, disabled: true, helperText: 'Se carga automáticamente con tu correo registrado' },
               { label: 'Número de Habitaciones', name: 'numhabitacion', type: 'number', required: true, inputProps: { min: 1, max: 10000 } },
-            ].map(({ label, name, type, required, inputProps, placeholder }) => (
-              <TextField
-                key={name}
-                label={label}
-                name={name}
-                type={type}
-                value={formData[name]}
-                onChange={handleInputChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                fullWidth
-                required={required}
-                inputProps={inputProps}
-                placeholder={placeholder}
-                error={touched[name] && !!validationErrors[name]}
-                helperText={touched[name] && validationErrors[name]}
+                          ].map(({ label, name, type, required, inputProps, placeholder, disabled, helperText }) => (
+                              <TextField
+                  key={name}
+                  label={label}
+                  name={name}
+                  type={type}
+                  value={formData[name]}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  variant="outlined"
+                  fullWidth
+                  required={required}
+                  disabled={disabled}
+                  inputProps={inputProps}
+                  placeholder={placeholder}
+                  error={touched[name] && !!validationErrors[name]}
+                  helperText={helperText || (touched[name] && validationErrors[name])}
                 sx={{
                   mb: 2,
                   '& .MuiOutlinedInput-root': {
@@ -661,6 +728,12 @@ const Hoteles = () => {
                     },
                     '&.Mui-error fieldset': {
                       borderColor: '#d32f2f',
+                    },
+                    '&.Mui-disabled': {
+                      backgroundColor: '#f5f5f5',
+                      '& fieldset': {
+                        borderColor: '#e0e0e0',
+                      },
                     },
                   },
                   '& .MuiInputLabel-root': {
@@ -745,6 +818,46 @@ const Hoteles = () => {
               )}
             </FormControl>
 
+            {/* Campo para servicios personalizados */}
+            {showCustomServicesInput && (
+              <TextField
+                label="Servicios Personalizados"
+                name="customServices"
+                type="text"
+                value={customServices}
+                onChange={handleCustomServicesChange}
+                variant="outlined"
+                fullWidth
+                placeholder="Escribe los servicios separados por comas (ej: WiFi, Estacionamiento, Spa)"
+                helperText="Escribe los servicios adicionales que no están en la lista anterior"
+                sx={{
+                  mb: 2,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    backgroundColor: '#f8fbfc',
+                    '& fieldset': {
+                      borderColor: '#b3c9ca',
+                      borderWidth: '2px',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#4c94bc',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#0b7583',
+                      boxShadow: '0 0 12px rgba(76, 148, 188, 0.2)',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#549c94',
+                    fontWeight: '600',
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#0b7583',
+                  },
+                }}
+              />
+            )}
+
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
               <TextField
                 label="Latitud"
@@ -786,24 +899,6 @@ const Hoteles = () => {
                   },
                 }}
               />
-              <IconButton
-                onClick={handleGetLocation}
-                title="Obtener mi ubicación"
-                sx={{
-                  backgroundColor: '#4c94bc',
-                  color: 'white',
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '8px',
-                  '&:hover': {
-                    backgroundColor: '#0b7583',
-                    transform: 'scale(1.05)',
-                  },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <MyLocationIcon />
-              </IconButton>
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -847,73 +942,9 @@ const Hoteles = () => {
                   },
                 }}
               />
-              <IconButton
-                onClick={handleGetLocation}
-                title="Obtener mi ubicación"
-                sx={{
-                  backgroundColor: '#4c94bc',
-                  color: 'white',
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '8px',
-                  '&:hover': {
-                    backgroundColor: '#0b7583',
-                    transform: 'scale(1.05)',
-                  },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <MyLocationIcon />
-              </IconButton>
             </Box>
 
-            <TextField
-              label="Buscar Ubicación"
-              name="ubicacionTexto"
-              type="text"
-              value={formData.ubicacionTexto}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              variant="outlined"
-              fullWidth
-              placeholder="Ej. UTHH, Huejutla"
-              sx={{
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  backgroundColor: '#f8fbfc',
-                  transition: 'all 0.3s ease',
-                  '& fieldset': {
-                    borderColor: '#b3c9ca',
-                    borderWidth: '2px',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#4c94bc',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#0b7583',
-                    boxShadow: '0 0 12px rgba(76, 148, 188, 0.2)',
-                  },
-                  '&.Mui-error fieldset': {
-                    borderColor: '#d32f2f',
-                  },
-                },
-                '& .MuiInputLabel-root': {
-                  color: '#549c94',
-                  fontWeight: '600',
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#0b7583',
-                },
-                '& .MuiInputLabel-root.Mui-error': {
-                  color: '#d32f2f',
-                },
-                '& .MuiFormHelperText-root.Mui-error': {
-                  color: '#d32f2f',
-                  fontWeight: '500',
-                },
-              }}
-            />
+
 
             <Box sx={{ gridColumn: '1 / -1', mb: 3 }}>
               <InputLabel sx={{ color: '#0b7583', fontWeight: '600', mb: 2, fontSize: '1rem' }}>

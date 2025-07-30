@@ -25,6 +25,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import ImageIcon from '@mui/icons-material/Image';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../Autenticacion/AuthContext';
 import Swal from 'sweetalert2';
@@ -207,6 +208,48 @@ const Cuartos = () => {
         title: 'Error',
         text: 'El nombre de la habitación debe ser un número positivo.',
         confirmButtonColor: '#0b7583',
+        customClass: {
+          container: 'swal2-container-custom',
+          popup: 'swal2-popup-custom'
+        },
+        backdrop: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: true,
+        confirmButtonText: 'Entendido'
+      });
+      return;
+    }
+
+    // Validar que el número de habitación no se repita en el mismo hotel
+    const numeroHabitacion = parseInt(formData.cuarto);
+    const hotelSeleccionado = formData.id_hoteles;
+    
+    // Filtrar cuartos del mismo hotel (excluyendo el que se está editando)
+    const cuartosDelMismoHotel = cuartos.filter(cuarto => 
+      cuarto.id_hoteles === hotelSeleccionado && 
+      cuarto.id !== editingId
+    );
+    
+    const numeroExiste = cuartosDelMismoHotel.some(cuarto => 
+      parseInt(cuarto.cuarto) === numeroHabitacion
+    );
+    
+    if (numeroExiste) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `El número de habitación ${numeroHabitacion} ya existe en este hotel.`,
+        confirmButtonColor: '#0b7583',
+        customClass: {
+          container: 'swal2-container-custom',
+          popup: 'swal2-popup-custom'
+        },
+        backdrop: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: true,
+        confirmButtonText: 'Entendido'
       });
       return;
     }
@@ -297,6 +340,19 @@ const Cuartos = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4, background: '#ffffff', minHeight: '100vh' }}>
+      <style>
+        {`
+          .swal2-container-custom {
+            z-index: 9999 !important;
+          }
+          .swal2-popup-custom {
+            z-index: 10000 !important;
+          }
+          .swal2-backdrop-show {
+            z-index: 9998 !important;
+          }
+        `}
+      </style>
       <Typography variant="h4" align="center" gutterBottom sx={{ color: '#0b7583', fontWeight: 'bold', mb: 4 }}>
         Gestión de Habitaciones
       </Typography>
@@ -357,7 +413,7 @@ const Cuartos = () => {
 
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
             <TextField
-              label="Nombre de la Habitación"
+              label="Número de la Habitación"
               name="cuarto"
               type="text"
               value={formData.cuarto}
@@ -401,23 +457,46 @@ const Cuartos = () => {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField
-              label="Tipo de Habitación"
-              name="idtipohabitacion"
-              select
-              value={formData.idtipohabitacion}
-              onChange={handleInputChange}
-              variant="outlined"
-              fullWidth
-              required
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiInputLabel-root': { color: '#549c94' } }}
-            >
-              {tiposHabitacion.map((tipo) => (
-                <MenuItem key={tipo.id_tipohabitacion} value={tipo.id_tipohabitacion}>
-                  {tipo.tipohabitacion}
-                </MenuItem>
-              ))}
-            </TextField>
+            
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
+              <TextField
+                label="Tipo de Habitación"
+                name="idtipohabitacion"
+                select
+                value={formData.idtipohabitacion}
+                onChange={handleInputChange}
+                variant="outlined"
+                fullWidth
+                required
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiInputLabel-root': { color: '#549c94' } }}
+              >
+                {tiposHabitacion.map((tipo) => (
+                  <MenuItem key={tipo.id_tipohabitacion} value={tipo.id_tipohabitacion}>
+                    {tipo.tipohabitacion}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/propietario/tiposhabitaciones')}
+                startIcon={<SettingsIcon />}
+                sx={{
+                  borderColor: '#4c94bc',
+                  color: '#4c94bc',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  px: 2,
+                  py: 1.5,
+                  '&:hover': {
+                    borderColor: '#0b7583',
+                    backgroundColor: '#4c94bc10',
+                  },
+                }}
+                title="Gestionar tipos de habitación"
+              >
+                Registrar
+              </Button>
+            </Box>
 
             <Box sx={{ gridColumn: '1 / -1', mt: 2 }}>
               <InputLabel sx={{ color: '#0b7583', fontWeight: '600', mb: 1 }}>Imágenes de la habitación (Galería)</InputLabel>
