@@ -337,13 +337,13 @@ const CatalogoPagos = () => {
     },
     "Transferencia": {
       id: "transferencia",
-      description: "Transferencia directa al propietario con cualquier tarjeta",
+      description: "Paga con cualquier tarjeta sin necesidad de tener Mercado Pago",
       icon: <MercadoPagoIcon />, // Usar el mismo ícono por ahora
       color: "#FF6B35",
       gradient: "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
-      features: ["Pago directo", "Cualquier tarjeta", "Transferencia inmediata"],
+      features: ["Sin cuenta MP", "Cualquier tarjeta", "Pago directo"],
       badge: "Directo",
-      subtitle: "Al propietario",
+      subtitle: "Sin Mercado Pago",
     },
     "Tarjeta de Débito": {
       id: "debit",
@@ -448,7 +448,7 @@ const handleContinue = async () => {
       );
     } else if (selectedMethod === methodProperties["Transferencia"].id) {
       response = await axios.post(
-        "https://backendreservas-m2zp.onrender.com/api/transferencias/crear-transferencia",
+        "https://backendreservas-m2zp.onrender.com/api/transferencias/crear-transferencia-directa",
         {
           id_usuario,
           id_habitacion,
