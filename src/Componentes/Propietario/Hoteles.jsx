@@ -598,6 +598,50 @@ const Hoteles = () => {
     [21.25, -98.30], // Noreste
   ];
 
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData((prev) => ({
+            ...prev,
+            latitud: latitude.toString(),
+            longitud: longitude.toString(),
+          }));
+          setMapCenter([latitude, longitude]);
+          setLocationError('');
+          setValidationErrors((prev) => ({
+            ...prev,
+            latitud: '',
+            longitud: '',
+          }));
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación actual:', error.message);
+          setLocationError('No se pudo obtener la ubicación actual. Por favor, verifique la configuración de geolocalización.');
+          setMapCenter([21.1399, -98.4194]); // Restablecer al centro de Huejutla en caso de error
+        }
+      );
+    } else {
+      setLocationError('La geolocalización no es soportada por su navegador.');
+    }
+  };
+
+  const clearCoordinates = () => {
+    setFormData((prev) => ({
+      ...prev,
+      latitud: '',
+      longitud: '',
+    }));
+    setMapCenter([21.1399, -98.4194]); // Restablecer al centro de Huejutla
+    setLocationError('');
+    setValidationErrors((prev) => ({
+      ...prev,
+      latitud: '',
+      longitud: '',
+    }));
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4, background: '#ffffff', minHeight: '100vh' }}>
       <Typography variant="h4" align="center" gutterBottom sx={{ color: '#0b7583', fontWeight: 'bold', mb: 4 }}>
@@ -899,6 +943,50 @@ const Hoteles = () => {
                   },
                 }}
               />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => getCurrentLocation()}
+                sx={{
+                  borderColor: '#4c94bc',
+                  color: '#4c94bc',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  px: 2,
+                  py: 1.5,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: '#0b7583',
+                    backgroundColor: '#4c94bc10',
+                  },
+                }}
+                title="Obtener ubicación actual"
+              >
+                📍
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={clearCoordinates}
+                sx={{
+                  borderColor: '#f3a384',
+                  color: '#f3a384',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  px: 2,
+                  py: 1.5,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: '#0b7583',
+                    backgroundColor: '#f3a38410',
+                  },
+                }}
+                title="Limpiar coordenadas"
+              >
+                🗙
+              </Button>
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -942,8 +1030,51 @@ const Hoteles = () => {
                   },
                 }}
               />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => getCurrentLocation()}
+                sx={{
+                  borderColor: '#4c94bc',
+                  color: '#4c94bc',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  px: 2,
+                  py: 1.5,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: '#0b7583',
+                    backgroundColor: '#4c94bc10',
+                  },
+                }}
+                title="Obtener ubicación actual"
+              >
+                📍
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={clearCoordinates}
+                sx={{
+                  borderColor: '#f3a384',
+                  color: '#f3a384',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  px: 2,
+                  py: 1.5,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: '#0b7583',
+                    backgroundColor: '#f3a38410',
+                  },
+                }}
+                title="Limpiar coordenadas"
+              >
+                🗙
+              </Button>
             </Box>
-
 
 
             <Box sx={{ gridColumn: '1 / -1', mb: 3 }}>
@@ -987,6 +1118,9 @@ const Hoteles = () => {
               </Box>
               <Typography variant="caption" sx={{ mt: 1, display: 'block', color: '#549c94', fontWeight: '500' }}>
                 Busca una ubicación o haz clic en el mapa para seleccionar la ubicación del hotel.
+              </Typography>
+              <Typography variant="caption" sx={{ mt: 1, display: 'block', color: '#4c94bc', fontWeight: '500' }}>
+                💡 Usa el botón 📍 para obtener tu ubicación actual o 🗙 para limpiar las coordenadas.
               </Typography>
             </Box>
 

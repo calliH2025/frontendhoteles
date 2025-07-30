@@ -94,7 +94,8 @@ const Promociones = () => {
   const fetchHoteles = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/hoteles`);
-      const userHoteles = response.data.filter(hotel => hotel.id_usuario === user.id);
+      // El backend devuelve { hoteles: [...], userEmail: ... }
+      const userHoteles = response.data.hoteles || response.data;
       setHoteles(userHoteles || []);
     } catch (error) {
       console.error('Error al obtener hoteles:', error);
@@ -104,10 +105,23 @@ const Promociones = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    
+    // Validación específica para el campo descuento
+    if (name === 'descuento') {
+      // Solo permitir números positivos del 1 al 99
+      const numValue = parseInt(value);
+      if (value === '' || (numValue >= 1 && numValue <= 99)) {
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -122,11 +136,11 @@ const Promociones = () => {
       });
       return;
     }
-    if (formData.descuento < 0 || formData.descuento > 100) {
+    if (formData.descuento < 1 || formData.descuento > 99) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'El descuento debe estar entre 0 y 100%.',
+        text: 'El descuento debe estar entre 1% y 99%.',
         confirmButtonColor: '#0b7583',
       });
       return;
@@ -204,8 +218,11 @@ const Promociones = () => {
   };
 
   const resetForm = () => {
+    // Si hay hoteles disponibles, establecer el primero por defecto
+    const defaultHotel = hoteles.length > 0 ? hoteles[0].id_hotel : '';
+    
     setFormData({
-      id_hotel: '',
+      id_hotel: defaultHotel,
       descripcion: '',
       descuento: '',
       fechainicio: '',
@@ -226,7 +243,16 @@ const Promociones = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setOpenModal(true)}
+          onClick={() => {
+            // Establecer el primer hotel por defecto si hay hoteles disponibles
+            if (hoteles.length > 0) {
+              setFormData(prev => ({
+                ...prev,
+                id_hotel: hoteles[0].id_hotel
+              }));
+            }
+            setOpenModal(true);
+          }}
           sx={{
             background: 'linear-gradient(135deg, #4c94bc, #549c94)',
             padding: '12px 24px',
@@ -314,7 +340,7 @@ const Promociones = () => {
               variant="outlined"
               fullWidth
               required
-              inputProps={{ min: 0, max: 100 }}
+              inputProps={{ min: 1, max: 99, title: "El descuento debe estar entre 1% y 99%" }}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiInputLabel-root': { color: '#549c94' } }}
             />
             <TextField

@@ -38,7 +38,7 @@ const MetodoPago = () => {
     { value: "Mercado Pago", label: "Mercado Pago" },
     { value: "Tarjeta de Débito", label: "Tarjeta de Débito" },
     { value: "Tarjeta de Crédito", label: "Tarjeta de Crédito" },
-    { value: "Transferencia Bancaria", label: "Transferencia Bancaria" },
+    { value: "Transferencia", label: "Transferencia" },
     { value: "Efectivo", label: "Efectivo" },
     { value: "PayPal", label: "PayPal" },
   ];

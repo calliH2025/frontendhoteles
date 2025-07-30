@@ -335,6 +335,16 @@ const CatalogoPagos = () => {
       badge: "Más usado",
       subtitle: "Rápido y seguro",
     },
+    "Transferencia": {
+      id: "transferencia",
+      description: "Transferencia directa al propietario con cualquier tarjeta",
+      icon: <MercadoPagoIcon />, // Usar el mismo ícono por ahora
+      color: "#FF6B35",
+      gradient: "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
+      features: ["Pago directo", "Cualquier tarjeta", "Transferencia inmediata"],
+      badge: "Directo",
+      subtitle: "Al propietario",
+    },
     "Tarjeta de Débito": {
       id: "debit",
       description: "Débito inmediato desde tu cuenta bancaria",
@@ -419,10 +429,12 @@ const handleContinue = async () => {
     return;
   }
 
-  if (selectedMethod === methodProperties["Mercado Pago"].id) {
-    setLoading(true);
-    try {
-      const response = await axios.post(
+  setLoading(true);
+  try {
+    let response;
+    
+    if (selectedMethod === methodProperties["Mercado Pago"].id) {
+      response = await axios.post(
         "https://backendreservas-m2zp.onrender.com/api/mercadopago/crear-preferencia",
         {
           id_usuario,
@@ -434,18 +446,33 @@ const handleContinue = async () => {
         },
         { headers: { "Content-Type": "application/json" } }
       );
-
-      const { init_point, external_reference } = response.data;
-      localStorage.setItem("external_reference", external_reference); // Almacenar para uso en historial
-      window.location.href = init_point;
-    } catch (err) {
-      setError(err.response?.data?.error || "Error al generar el enlace de pago. Intenta de nuevo.");
-      console.error("Error al crear preferencia:", err);
-    } finally {
+    } else if (selectedMethod === methodProperties["Transferencia"].id) {
+      response = await axios.post(
+        "https://backendreservas-m2zp.onrender.com/api/transferencias/crear-transferencia",
+        {
+          id_usuario,
+          id_habitacion,
+          fechainicio,
+          fechafin,
+          tipo_tarifa,
+          totalpagar,
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
+    } else {
+      setError("Método de pago no implementado aún. Selecciona Mercado Pago o Transferencia.");
       setLoading(false);
+      return;
     }
-  } else {
-    setError("Método de pago no implementado aún. Selecciona Mercado Pago.");
+
+    const { init_point, external_reference } = response.data;
+    localStorage.setItem("external_reference", external_reference); // Almacenar para uso en historial
+    window.location.href = init_point;
+  } catch (err) {
+    setError(err.response?.data?.error || "Error al generar el enlace de pago. Intenta de nuevo.");
+    console.error("Error al crear preferencia:", err);
+  } finally {
+    setLoading(false);
   }
 };
 

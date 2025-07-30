@@ -114,8 +114,20 @@ const Cuartos = () => {
   const fetchHoteles = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/hoteles`);
-      const userHoteles = response.data.filter(hotel => hotel.id_usuario === user.id);
+      // El backend devuelve { hoteles: [...], userEmail: ... }
+      const userHoteles = response.data.hoteles || response.data;
       setHoteles(userHoteles || []);
+      
+      // Si hay un hotel específico en la URL y no hay un hotel seleccionado, establecer el hotel específico por defecto
+      if (idHotelParam && userHoteles && userHoteles.length > 0 && !formData.id_hoteles && !editingId) {
+        const hotelEspecifico = userHoteles.find(hotel => hotel.id_hotel == idHotelParam);
+        if (hotelEspecifico) {
+          setFormData(prev => ({
+            ...prev,
+            id_hoteles: hotelEspecifico.id_hotel
+          }));
+        }
+      }
     } catch (error) {
       console.error('Error al obtener hoteles:', error);
       setErrorMessage('Error al cargar los hoteles. Intente de nuevo.');
@@ -323,10 +335,20 @@ const Cuartos = () => {
   };
 
   const resetForm = () => {
+    // Si hay un hotel específico en la URL, usar ese, si no, usar el primero disponible
+    let defaultHotel = '';
+    if (idHotelParam && hoteles.length > 0) {
+      // Buscar el hotel específico por su ID
+      const hotelEspecifico = hoteles.find(hotel => hotel.id_hotel == idHotelParam);
+      defaultHotel = hotelEspecifico ? hotelEspecifico.id_hotel : hoteles[0].id_hotel;
+    } else if (hoteles.length > 0) {
+      defaultHotel = hoteles[0].id_hotel;
+    }
+    
     setFormData({
       cuarto: '',
       estado: 'Disponible',
-      id_hoteles: '',
+      id_hoteles: defaultHotel,
       idtipohabitacion: '',
       imagenes: [],
       imagenhabitacion: null,
@@ -361,7 +383,25 @@ const Cuartos = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setOpenModal(true)}
+          onClick={() => {
+            // Si hay un hotel específico en la URL, usar ese, si no, usar el primero disponible
+            let defaultHotel = '';
+            if (idHotelParam && hoteles.length > 0) {
+              // Buscar el hotel específico por su ID
+              const hotelEspecifico = hoteles.find(hotel => hotel.id_hotel == idHotelParam);
+              defaultHotel = hotelEspecifico ? hotelEspecifico.id_hotel : hoteles[0].id_hotel;
+            } else if (hoteles.length > 0) {
+              defaultHotel = hoteles[0].id_hotel;
+            }
+            
+            if (defaultHotel) {
+              setFormData(prev => ({
+                ...prev,
+                id_hoteles: defaultHotel
+              }));
+            }
+            setOpenModal(true);
+          }}
           sx={{
             background: 'linear-gradient(135deg, #4c94bc, #549c94)',
             padding: '12px 24px',
@@ -448,14 +488,31 @@ const Cuartos = () => {
               variant="outlined"
               fullWidth
               required
-              disabled={editingId !== null}
+              disabled={editingId !== null || (idHotelParam && hoteles.length > 0)}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiInputLabel-root': { color: '#549c94' } }}
             >
-              {hoteles.map((hotel) => (
-                <MenuItem key={hotel.id_hotel} value={hotel.id_hotel}>
-                  {hotel.nombrehotel}
-                </MenuItem>
-              ))}
+              {idHotelParam && hoteles.length > 0 ? (
+                // Si hay un hotel específico, mostrar solo ese hotel
+                (() => {
+                  const hotelEspecifico = hoteles.find(hotel => hotel.id_hotel == idHotelParam);
+                  return hotelEspecifico ? (
+                    <MenuItem key={hotelEspecifico.id_hotel} value={hotelEspecifico.id_hotel}>
+                      {hotelEspecifico.nombrehotel}
+                    </MenuItem>
+                  ) : (
+                    <MenuItem value="" disabled>
+                      Hotel no encontrado
+                    </MenuItem>
+                  );
+                })()
+              ) : (
+                // Si no hay hotel específico, mostrar todos los hoteles
+                hoteles.map((hotel) => (
+                  <MenuItem key={hotel.id_hotel} value={hotel.id_hotel}>
+                    {hotel.nombrehotel}
+                  </MenuItem>
+                ))
+              )}
             </TextField>
             
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
