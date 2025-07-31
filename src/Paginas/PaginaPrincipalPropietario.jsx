@@ -1,4 +1,5 @@
 import { Card, CardContent, Button, Typography, Grid, Box, Chip, Paper, Container } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 import {
   Person as PersonIcon,
   LocalOffer as TagIcon,
@@ -11,6 +12,8 @@ import {
 } from "@mui/icons-material"
 
 export default function Propietario() {
+  const navigate = useNavigate()
+  
   const menuItems = [
     {
       title: "Perfil",
@@ -18,6 +21,7 @@ export default function Propietario() {
       icon: PersonIcon,
       color: "#1976d2",
       gradient: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
+      route: "/propietario/perfilusuario",
     },
     {
       title: "Promociones",
@@ -25,6 +29,7 @@ export default function Propietario() {
       icon: TagIcon,
       color: "#388e3c",
       gradient: "linear-gradient(135deg, #388e3c 0%, #2e7d32 100%)",
+      route: "/propietario/promociones",
     },
     {
       title: "Gestión Reservas",
@@ -32,6 +37,7 @@ export default function Propietario() {
       icon: CalendarIcon,
       color: "#7b1fa2",
       gradient: "linear-gradient(135deg, #7b1fa2 0%, #6a1b9a 100%)",
+      route: "/propietario/gestionreservas",
     },
     {
       title: "Reportes",
@@ -39,6 +45,7 @@ export default function Propietario() {
       icon: BarChartIcon,
       color: "#f57c00",
       gradient: "linear-gradient(135deg, #f57c00 0%, #ef6c00 100%)",
+      route: "/propietario/reportes",
     },
     {
       title: "Hoteles",
@@ -46,6 +53,7 @@ export default function Propietario() {
       icon: BuildingIcon,
       color: "#303f9f",
       gradient: "linear-gradient(135deg, #303f9f 0%, #283593 100%)",
+      route: "/propietario/hoteles",
     },
     {
       title: "Tarifas",
@@ -53,6 +61,7 @@ export default function Propietario() {
       icon: DollarIcon,
       color: "#00796b",
       gradient: "linear-gradient(135deg, #00796b 0%, #00695c 100%)",
+      route: "/propietario/tiposhabitaciones",
     },
     {
       title: "Conexión Mercado Pago",
@@ -60,6 +69,7 @@ export default function Propietario() {
       icon: CreditCardIcon,
       color: "#0097a7",
       gradient: "linear-gradient(135deg, #0097a7 0%, #00838f 100%)",
+      route: "/propietario/conexionmp",
     },
   ]
 
@@ -111,6 +121,7 @@ export default function Propietario() {
             return (
               <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                 <Card
+                  onClick={() => navigate(item.route)}
                   sx={{
                     height: "100%",
                     cursor: "pointer",
@@ -161,6 +172,7 @@ export default function Propietario() {
                       variant="contained"
                       fullWidth
                       endIcon={<ArrowForwardIcon />}
+                      onClick={() => navigate(item.route)}
                       sx={{
                         background: item.gradient,
                         "&:hover": {

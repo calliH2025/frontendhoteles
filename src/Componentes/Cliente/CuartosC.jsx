@@ -8,6 +8,8 @@ import {
   Card,
   CardMedia,
   CardContent,
+  CardActions,
+  Button,
   Grid,
   Alert,
   Chip,
@@ -226,65 +228,104 @@ const CuartosP = ({ idHotel }) => {
             return (
               <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={cuarto.id}>
                 <Fade in={true} timeout={800 + index * 100}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      borderRadius: '16px',
-                      background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%)',
-                      boxShadow: '0 4px 24px rgba(76, 148, 188, 0.07)',
-                      border: '1px solid #e0e6ed',
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        transform: 'translateY(-6px) scale(1.02)',
-                        boxShadow: '0 12px 32px rgba(76, 148, 188, 0.15)',
-                        border: `1.5px solid ${colors.primary}`,
-                      },
-                    }}
-                    onClick={() => handleCardClick(cuarto.id)}
-                  >
-                    {/* Image Section */}
-                    {primaryImage ? (
-                      <Box sx={styles.imageContainer}>
-                        <CardMedia
-                          component="img"
-                          height="220"
-                          image={primaryImage}
-                          alt={`Imagen de ${cuarto.cuarto}`}
-                          sx={{ 
-                            objectFit: 'cover', 
-                            borderRadius: '16px 16px 0 0',
-                            transition: 'transform 0.2s',
-                            '&:hover': {
-                              transform: 'scale(1.03)',
-                            }
-                          }}
-                        />
-                      </Box>
-                    ) : (
-                      <Box sx={styles.noImageBox}>
-                        <Hotel sx={{ fontSize: 50, color: 'white', mb: 1 }} />
-                        <Typography 
-                          variant="body1" 
-                          sx={{ color: 'white', fontStyle: 'italic' }}
-                        >
-                          Sin imagen disponible
-                        </Typography>
-                      </Box>
-                    )}
+                                                          <Card
+                       sx={{ 
+                         height: 450, 
+                         boxShadow: 3, 
+                         borderRadius: 2,
+                         display: "flex",
+                         flexDirection: "column",
+                         overflow: "hidden"
+                       }}
+                     >
+                                         {/* Image Section */}
+                     {primaryImage ? (
+                       <Box sx={{ 
+                         height: 200, 
+                         width: "100%",
+                         display: "flex",
+                         alignItems: "center",
+                         justifyContent: "center",
+                         backgroundColor: "#f5f5f5",
+                         flexShrink: 0,
+                         flexGrow: 0,
+                         minHeight: 200,
+                         maxHeight: 200
+                       }}>
+                         <img
+                           src={primaryImage}
+                           alt={`Imagen de ${cuarto.cuarto}`}
+                           style={{
+                             maxWidth: "100%",
+                             maxHeight: "100%",
+                             objectFit: "contain",
+                             objectPosition: "center"
+                           }}
+                         />
+                       </Box>
+                     ) : (
+                       <Box sx={{ 
+                         height: 200, 
+                         width: "100%",
+                         display: "flex",
+                         alignItems: "center",
+                         justifyContent: "center",
+                         backgroundColor: "#f5f5f5",
+                         flexShrink: 0,
+                         flexGrow: 0,
+                         minHeight: 200,
+                         maxHeight: 200
+                       }}>
+                         <Hotel sx={{ fontSize: 50, color: 'white', mb: 1 }} />
+                         <Typography 
+                           variant="body1" 
+                           sx={{ color: 'white', fontStyle: 'italic' }}
+                         >
+                           Sin imagen disponible
+                         </Typography>
+                       </Box>
+                     )}
 
                     {/* Content Section */}
-                    <CardContent sx={{ ...styles.cardContent, padding: '1.5rem' }}>
+                    <CardContent sx={{ 
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      p: 2,
+                      overflow: "hidden",
+                      minHeight: 180
+                    }}>
                       <Box>
-                        <Typography variant="h6" sx={{ ...styles.roomTitle, fontSize: '1.15rem', mb: 0.5 }}>
-                          <Hotel sx={{ mr: 1, fontSize: '1.3rem' }} />
-                          Habitación {cuarto.cuarto}
-                        </Typography>
-                        <Typography variant="body1" sx={{ ...styles.roomType, fontWeight: 600, color: colors.primary, mb: 1 }}>
-                          Tipo: {cuarto.tipohabitacion || 'No especificado'}
-                        </Typography>
+                                                 <Typography 
+                           variant="h6" 
+                           sx={{ 
+                             mb: 1,
+                             fontSize: "1.1rem",
+                             fontWeight: 600,
+                             lineHeight: 1.3,
+                             overflow: "hidden",
+                             textOverflow: "ellipsis",
+                             whiteSpace: "nowrap"
+                           }}
+                         >
+                           <Hotel sx={{ mr: 1, fontSize: '1.3rem' }} />
+                           Habitación {cuarto.cuarto}
+                         </Typography>
+                                                 <Typography 
+                           variant="body2" 
+                           color="text.secondary"
+                           sx={{ 
+                             mb: 2,
+                             flexGrow: 1,
+                             lineHeight: 1.4,
+                             display: "-webkit-box",
+                             WebkitLineClamp: 3,
+                             WebkitBoxOrient: "vertical",
+                             overflow: "hidden"
+                           }}
+                         >
+                           Tipo: {cuarto.tipohabitacion || 'No especificado'}
+                         </Typography>
                         <Chip
                           icon={getStatusIcon(cuarto.estado)}
                           label={normalizedEstado || 'Sin estado'}
@@ -297,19 +338,36 @@ const CuartosP = ({ idHotel }) => {
                         />
                       </Box>
 
-                      <Box>
-                        <Box sx={styles.infoBox}>
-                          <Schedule sx={{ mr: 1, fontSize: '1.3rem', color: colors.accent }} />
-                          <Typography variant="body1">
-                            {cuarto.horario 
-                              ? new Date(cuarto.horario).toLocaleDateString()
-                              : 'Horario no especificado'
-                            }
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
+                                             <Box sx={{ 
+                         mt: "auto",
+                         display: "flex", 
+                         justifyContent: "space-between",
+                         alignItems: "center"
+                       }}>
+                         <Typography variant="body2" color="text.secondary">
+                           Estado: {cuarto.estado || "N/A"}
+                         </Typography>
+                         <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 600 }}>
+                           ${cuarto.preciodia || "N/A"}/día
+                         </Typography>
+                                              </Box>
+                     </CardContent>
+                     <CardActions sx={{ p: 2, pt: 0 }}>
+                       <Button 
+                         size="small" 
+                         variant="contained"
+                         fullWidth
+                         sx={{ 
+                           borderRadius: 1,
+                           textTransform: "none",
+                           fontWeight: 600
+                         }}
+                         onClick={() => handleCardClick(cuarto.id)}
+                       >
+                         Ver Detalles
+                       </Button>
+                     </CardActions>
+                   </Card>
                 </Fade>
               </Grid>
             );
