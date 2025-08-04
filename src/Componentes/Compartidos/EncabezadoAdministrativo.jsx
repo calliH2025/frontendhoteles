@@ -127,7 +127,6 @@ const EncabezadoAdministrativo = () => {
           --color-icon:rgb(13, 226, 34);
           --color-icon2:rgb(175, 185, 30);
           --color-icon3:rgb(145, 7, 157);
-          
         }
 
         .header {
@@ -148,13 +147,13 @@ const EncabezadoAdministrativo = () => {
         }
 
         .logo img {
-          width: 60px;
-          height: 10px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
           margin-right: 10px;
         }
 
-        .logo h1 {
+        .logo h3 {
           font-size: 1.5rem;
           font-weight: bold;
           color: var(--color-secondary);
@@ -196,8 +195,8 @@ const EncabezadoAdministrativo = () => {
           border-radius: 5px;
         }
 
-        .menu ul .dropdown-menu {
-          display: ${openDropdown ? 'block' : 'none'};
+        .dropdown-menu {
+          display: none;
           position: absolute;
           left: 0;
           top: 100%;
@@ -207,9 +206,20 @@ const EncabezadoAdministrativo = () => {
           margin-top: 10px;
           border-radius: 5px;
           z-index: 10;
+          min-width: 180px;
         }
 
-        .menu ul .dropdown-menu li {
+        .dropdown:hover .dropdown-menu {
+          display: block;
+        }
+
+        @media (max-width: 768px) {
+          .dropdown:hover .dropdown-menu {
+            display: none;
+          }
+        }
+
+        .dropdown-menu li {
           padding: 8.5px 12px;
           cursor: pointer;
           color: var(--color-secondary);
@@ -226,16 +236,14 @@ const EncabezadoAdministrativo = () => {
           width: 25px;
           height: 3px;
           background-color: var(--color-secondary);
-          transition: background-color 0.3s ease;
         }
 
         @media (max-width: 768px) {
           .menu ul {
-            display: none;
             flex-direction: column;
             position: fixed;
             top: 0;
-            left: 0;
+            left: -100%;
             width: 70%;
             height: 100%;
             background-color: var(--color-mobile-bg);
@@ -243,18 +251,34 @@ const EncabezadoAdministrativo = () => {
             transition: left 0.3s ease-in-out;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
             z-index: 999;
+            overflow-y: auto;
           }
 
           .menu.menu-open ul {
-            display: flex;
             left: 0;
           }
 
           .menu ul li {
+            flex-direction: column;
+            align-items: flex-start;
             padding: 20px;
             border-bottom: 1px solid var(--color-hover);
-            text-align: right;
             color: var(--color-mobile-text);
+          }
+
+          .dropdown-menu {
+            display: ${openDropdown ? 'block' : 'none'} !important;
+            position: static !important;
+            background-color: transparent !important;
+            padding: 0 !important;
+            margin-top: 10px;
+          }
+
+          .dropdown-menu li {
+            padding: 10px 20px;
+            background-color: var(--color-primary);
+            color: var(--color-secondary);
+            border-bottom: 1px solid var(--color-hover);
           }
 
           .mobile-menu-icon {
@@ -265,61 +289,67 @@ const EncabezadoAdministrativo = () => {
 
       <header className="header">
         <div className="logo">
-          {logoUrl && (
-            <img src={logoUrl} alt="Logo de la Empresa" style={{ height: '50px', width: '50px', marginRight: '10px' }} />
-          )}
+          {logoUrl && <img src={logoUrl} alt="Logo de la Empresa" />}
           <h3>{nombreEmpresa}</h3>
         </div>
         <nav className={`menu ${isMobileMenuOpen ? 'menu-open' : ''}`} ref={menuRef}>
           <ul>
             <li onClick={() => handleMenuClick('home')}>
-              <HomeOutlined style={{ color: 'pink', marginRight: '8px' }} />
+              <HomeOutlined style={{ color: 'pink' }} />
               Home
             </li>
-            <li className="dropdown" onClick={() => toggleDropdown('empresa')}>
+            
+            <li
+              className="dropdown"
+              onClick={() => toggleDropdown('empresa')}
+            >
               <span>
-                <FileTextOutlined style={{ color: 'orange', marginRight: '8px' }} />
+                <FileTextOutlined style={{ color: 'orange' }} />
                 Datos de la Empresa
               </span>
-              {openDropdown === 'empresa' && (
-                <ul className="dropdown-menu">
-                  <li onClick={() => { handleClick('perfil'); handleMenuClick('perfil'); }}>Perfil</li>
-                  <li onClick={() => { handleClick('terminos'); handleMenuClick('terminos'); }}>Términos</li>
-                  <li onClick={() => { handleClick('politicas'); handleMenuClick('politicas'); }}>Políticas</li>
-                  <li onClick={() => { handleClick('mision'); handleMenuClick('mision'); }}>Misión</li>
-                  <li onClick={() => { handleClick('vision'); handleMenuClick('vision'); }}>Visión</li>
-                </ul>
-              )}
+              <ul className="dropdown-menu" style={{ display: openDropdown === 'empresa' ? 'block' : 'none' }}>
+                <li onClick={() => { handleClick('perfil'); handleMenuClick('perfil'); }}>Perfil</li>
+                <li onClick={() => { handleClick('terminos'); handleMenuClick('terminos'); }}>Términos</li>
+                <li onClick={() => { handleClick('politicas'); handleMenuClick('politicas'); }}>Políticas</li>
+                <li onClick={() => { handleClick('mision'); handleMenuClick('mision'); }}>Misión</li>
+                <li onClick={() => { handleClick('vision'); handleMenuClick('vision'); }}>Visión</li>
+              </ul>
             </li>
-            <li className="dropdown" onClick={() => toggleDropdown('gestiongeneral')}>
+
+            <li
+              className="dropdown"
+              onClick={() => toggleDropdown('gestiongeneral')}
+            >
               <span>
                 <ShopOutlined style={{ color: 'var(--color-icon)' }} />
                 Gestión General
               </span>
-              {openDropdown === 'gestiongeneral' && (
-                <ul className="dropdown-menu">
-                  <li onClick={() => { handleClick('Alojamientos'); handleMenuClick('Alojamientos'); }}>Hoteles</li>
-                  <li onClick={() => { handleClick('Reservas'); handleMenuClick('Reservas'); }}>Reservas</li>
-                  <li onClick={() => { handleClick('Estadisticas'); handleMenuClick('Estadisticas'); }}>Estadísticas</li>
-                  <li onClick={() => { handleClick('Promociones'); handleMenuClick('Promociones'); }}>Promociones</li>
-                   <li onClick={() => { handleClick('MetodoPago'); handleMenuClick('MetodoPago'); }}>Método de Pago</li>
-                </ul>
-              )}
+              <ul className="dropdown-menu" style={{ display: openDropdown === 'gestiongeneral' ? 'block' : 'none' }}>
+                <li onClick={() => { handleClick('Alojamientos'); handleMenuClick('Alojamientos'); }}>Hoteles</li>
+                <li onClick={() => { handleClick('Reservas'); handleMenuClick('Reservas'); }}>Reservas</li>
+                <li onClick={() => { handleClick('Estadisticas'); handleMenuClick('Estadisticas'); }}>Estadísticas</li>
+                <li onClick={() => { handleClick('Promociones'); handleMenuClick('Promociones'); }}>Promociones</li>
+                <li onClick={() => { handleClick('MetodoPago'); handleMenuClick('MetodoPago'); }}>Método de Pago</li>
+              </ul>
             </li>
+
             <li onClick={() => handleMenuClick('Usuarios')}>
               <TeamOutlined style={{ color: 'var(--color-icon2)' }} />
-               Gestion de Usuarios
+              Gestion de Usuarios
             </li>
+
             <li onClick={() => handleMenuClick('PerfilUsuario')}>
               <UserOutlined style={{ color: 'var(--color-icon3)' }} />
-               Perfil
+              Perfil
             </li>
+
             <li onClick={() => handleMenuClick('cerrarSesion')}>
-              <LogoutOutlined style={{ color: 'Red', marginRight: '8px' }} />
+              <LogoutOutlined style={{ color: 'Red' }} />
               Cerrar Sesión
             </li>
           </ul>
         </nav>
+
         <div className="mobile-menu-icon" onClick={toggleMobileMenu}>
           <div className="hamburger"></div>
           <div className="hamburger"></div>
